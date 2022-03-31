@@ -39,7 +39,6 @@ const listenCommands = () => {
 
   client.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
-    console.log("interaction has been made!");
     const { commandName } = interaction;
 
     if (commandName === "ping") {
