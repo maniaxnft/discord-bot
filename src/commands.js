@@ -10,14 +10,14 @@ const initCommands = () => {
 
   const commands = [
     new SlashCommandBuilder()
-      .setName("ping")
+      .setName("m-ping")
       .setDescription("Replies with pong!"),
     new SlashCommandBuilder()
-      .setName("server")
+      .setName("m-server")
       .setDescription("Replies with server info!"),
     new SlashCommandBuilder()
-      .setName("user")
-      .setDescription("Replies with user info!"),
+      .setName("m-invites")
+      .setDescription("Shows top 10 inviters"),
   ].map((command) => command.toJSON());
 
   const rest = new REST({ version: "9" }).setToken(token);
@@ -39,14 +39,20 @@ const listenCommands = () => {
 
   client.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
+    const isAdmin = interaction.member.roles.cache.map(
+      (role) => role.name === process.env.ADMIN_ROLE_NAME
+    );
     const { commandName } = interaction;
-
-    if (commandName === "ping") {
+    if (commandName === "m-ping" && isAdmin) {
       await interaction.reply("Pong!");
-    } else if (commandName === "server") {
-      await interaction.reply("Server info.");
-    } else if (commandName === "user") {
-      await interaction.reply("User info.");
+    } else if (commandName === "m-server" && isAdmin) {
+      await interaction.reply(
+        `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
+      );
+    } else if (commandName === "m-invites" && isAdmin) {
+      await interaction.reply("Going to show top 10 invites");
+    } else {
+      await interaction.reply("Resolver for this command does not found");
     }
   });
 };
