@@ -29,7 +29,9 @@ const initCommands = () => {
 };
 
 const listenCommands = () => {
-  const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+  const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  });
   client.login(process.env.DISCORD_TOKEN);
   client.once("ready", () => {
     console.log("Client is ready to use!");

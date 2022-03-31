@@ -2,7 +2,9 @@ const { Client, Intents } = require("discord.js");
 const { inviteModel } = require("./inviteRepository");
 
 const trackInvites = () => {
-  const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+  const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  });
 
   client.login(process.env.DISCORD_TOKEN);
 
@@ -20,11 +22,15 @@ const trackInvites = () => {
       // Set the key as Guild ID, and create a map which has the invite code, and the number of uses
       if (Array.isArray(firstInvites)) {
         firstInvites.map((invite) => {
-          inviteModel.create({
-            guildId: guild.id,
-            code: invite.code,
-            inviteCount: invite.uses,
-          });
+          inviteModel.findOneAndUpdate(
+            { code: invite.code },
+            {
+              guildId: guild.id,
+              code: invite.code,
+              inviteCount: invite.uses,
+            },
+            { upsert: true }
+          );
         });
       }
     });
