@@ -1,21 +1,15 @@
-require('dotenv').config()
+require("dotenv").config();
+const { initCommands, listenCommands } = require("./commands");
+const { init } = require("./init");
+const { trackInvites } = require("./invite/inviteTracker");
+const { listenTweets } = require("./twitter");
 
-const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const boot = () => {
+  init();
+  initCommands();
+  listenCommands();
+  // trackInvites();
+  // listenTweets();
+};
 
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`)
-
-  // send private message
-  client.users.fetch(process.env.TEST_USERID).then((user) => { 
-    user.send('private message!');
-   });
-})
-
-client.on("message", msg => {
-  if (msg.content === "ping") {
-    msg.reply("pong");
-  }
-})
-
-client.login(process.env.TOKEN)
+boot();
