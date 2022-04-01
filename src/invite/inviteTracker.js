@@ -66,7 +66,8 @@ const trackInvites = () => {
     );
     const inviter = await bot.users.fetch(invite.inviter.id);
     const logChannel = member.guild.channels.cache.find(
-      (channel) => channel.name === process.env.INVITE_TRACKER_CHANNEL_NAME
+      (channel) =>
+        channel.name === process.env.DISCORD_INVITE_TRACKER_CHANNEL_NAME
     );
     if (inviter) {
       await inviteModel.create({
@@ -84,7 +85,7 @@ const trackInvites = () => {
 
     if (!inviter) {
       const infoChannel = member.guild.channels.cache.find(
-        (channel) => channel.name === process.env.BOT_INFO_CHANNEL_NAME
+        (channel) => channel.name === process.env.DISCORD_BOT_INFO_CHANNEL_NAME
       );
       if (infoChannel) {
         infoChannel.send(

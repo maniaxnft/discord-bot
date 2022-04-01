@@ -5,8 +5,8 @@ const Discord = require("discord.js");
 const axios = require("axios");
 
 const initCommands = () => {
-  const clientId = process.env.CLIENT_ID;
-  const guildId = process.env.GUILD_ID;
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const guildId = process.env.DISCORD_GUILD_ID;
   const token = process.env.DISCORD_TOKEN;
 
   const commands = [
@@ -30,6 +30,8 @@ const initCommands = () => {
     .put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
     .then(() => console.log("Successfully registered application commands."))
     .catch(console.error);
+
+  listenCommands();
 };
 
 const listenCommands = () => {
@@ -41,13 +43,13 @@ const listenCommands = () => {
   });
   bot.login(process.env.DISCORD_TOKEN);
   bot.once("ready", () => {
-    console.log("Client is ready to use!");
+    console.log("Command bot is ready to use!");
   });
 
   bot.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
     const isAdmin = interaction?.member?.roles?.cache?.map(
-      (role) => role.name === process.env.ADMIN_ROLE_NAME
+      (role) => role.name === process.env.DISCORD_ADMIN_ROLE_NAME
     );
 
     const { commandName } = interaction;
@@ -91,7 +93,4 @@ const getAvaxPrice = async () => {
   }
 };
 
-module.exports = {
-  initCommands,
-  listenCommands,
-};
+module.exports = initCommands;
