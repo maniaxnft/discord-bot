@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const inviteSchema = mongoose.Schema({
+  inviter: String,
   guildId: String,
   code: String,
   inviteCount: String,

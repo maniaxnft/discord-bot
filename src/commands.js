@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const { Client, Intents } = require("discord.js");
+const Discord = require("discord.js");
+const axios = require("axios");
 
 const initCommands = () => {
   const clientId = process.env.CLIENT_ID;
@@ -18,6 +19,9 @@ const initCommands = () => {
     new SlashCommandBuilder()
       .setName("m-invites")
       .setDescription("Shows top 10 inviters"),
+    new SlashCommandBuilder()
+      .setName("avaxprice")
+      .setDescription("Shows current AVAX price"),
   ].map((command) => command.toJSON());
 
   const rest = new REST({ version: "9" }).setToken(token);
@@ -29,19 +33,23 @@ const initCommands = () => {
 };
 
 const listenCommands = () => {
-  const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  const bot = new Discord.Client({
+    intents: [
+      Discord.Intents.FLAGS.GUILDS,
+      Discord.Intents.FLAGS.GUILD_MESSAGES,
+    ],
   });
-  client.login(process.env.DISCORD_TOKEN);
-  client.once("ready", () => {
+  bot.login(process.env.DISCORD_TOKEN);
+  bot.once("ready", () => {
     console.log("Client is ready to use!");
   });
 
-  client.on("interactionCreate", async (interaction) => {
+  bot.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
-    const isAdmin = interaction.member.roles.cache.map(
+    const isAdmin = interaction?.member?.roles?.cache?.map(
       (role) => role.name === process.env.ADMIN_ROLE_NAME
     );
+
     const { commandName } = interaction;
     if (commandName === "m-ping" && isAdmin) {
       await interaction.reply("Pong!");
@@ -51,10 +59,36 @@ const listenCommands = () => {
       );
     } else if (commandName === "m-invites" && isAdmin) {
       await interaction.reply("Going to show top 10 invites");
+    } else if (commandName === "avaxprice") {
+      const price = await getAvaxPrice();
+      if (!price) {
+        await interaction.reply("Can't get price for now.");
+        return;
+      }
+      await interaction.reply(price);
     } else {
       await interaction.reply("Resolver for this command does not found");
     }
   });
+};
+
+const getAvaxPrice = async () => {
+  try {
+    const response = await axios({
+      url: `${process.env.COINGECKO_V3_API_URL}/simple/price?ids=avalanche-2&vs_currencies=usd`,
+      method: "get",
+    });
+    if (response?.data?.["avalanche-2"]?.usd) {
+      return response?.data?.["avalanche-2"]?.usd.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    } else {
+      return false;
+    }
+  } catch (e) {
+    return false;
+  }
 };
 
 module.exports = {

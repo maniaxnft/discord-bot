@@ -1,9 +1,14 @@
 const Twit = require("twit");
 const Discord = require("discord.js");
-const client = new Discord.Client();
 
 const listenTweets = () => {
   /*
+  const client = new Discord.Client({
+    intents: [
+      Discord.Intents.FLAGS.GUILDS,
+      Discord.Intents.FLAGS.GUILD_MESSAGES,
+    ],
+  });
   const T = new Twit({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
