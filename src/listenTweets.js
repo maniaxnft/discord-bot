@@ -79,7 +79,7 @@ const streamConnect = (bot, retryAttempt) => {
 };
 
 const sendTweetToChannel = async (bot, tweet) => {
-  const channel = await bot.channels.cache.get(
+  const channel = await bot?.channels?.cache?.get(
     process.env.DISCORD_TWEETS_CHANNEL_ID
   );
   const tweetText = tweet?.data?.text;
