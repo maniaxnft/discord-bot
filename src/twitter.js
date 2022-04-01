@@ -1,51 +1,138 @@
-const Twit = require("twit");
 const Discord = require("discord.js");
+const needle = require("needle");
 
-const listenTweets = () => {
-  /*
-  const client = new Discord.Client({
+const listenTweets = async () => {
+  const token = process.env.TWITTER_BEARER_TOKEN;
+  const bot = new Discord.Client({
     intents: [
       Discord.Intents.FLAGS.GUILDS,
       Discord.Intents.FLAGS.GUILD_MESSAGES,
     ],
   });
-  const T = new Twit({
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token: process.env.TWITTER_ACCESS_TOKEN,
-    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-    timeout_ms: 60 * 1000,
-    strictSSL: true,
-  });
-  client.login(process.env.DISCORD_TOKEN);
-  client.once("ready", () => {
-    const stream = T.stream("statuses/filter", {
-      follow: [process.env.TWITTER_USER_ID],
+
+  const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
+  const streamURL = "https://api.twitter.com/2/tweets/search/stream";
+
+  const rules = [
+    {
+      value: "dog has:images -is:retweet",
+      tag: "dog pictures",
+    },
+    {
+      value: "cat has:images -grumpy",
+      tag: "cat pictures",
+    },
+  ];
+
+  async function getAllRules() {
+    const response = await needle("get", rulesURL, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.statusCode !== 200) {
+      console.log("Error:", response.statusMessage, response.statusCode);
+      throw new Error(response.body);
+    }
+    return response.body;
+  }
+
+  async function deleteAllRules(rules) {
+    if (!Array.isArray(rules.data)) {
+      return null;
+    }
+    const ids = rules.data.map((rule) => rule.id);
+    const data = {
+      delete: {
+        ids: ids,
+      },
+    };
+
+    const response = await needle("post", rulesURL, data, {
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
     });
 
-    stream.on("tweet", function (tweet) {
-      //only show owner tweets
-      if (tweet.user.id == process.env.TWITTER_USER_ID) {
-        const url =
-          "https://twitter.com/" +
-          tweet.user.screen_name +
-          "/status/" +
-          tweet.id_str;
-        try {
-          let channel = client.channels
-            .fetch(process.env.DISCORD_OFFICIAL_TWEETS_CHANNEL_ID)
-            .then((channel) => {
-              channel.send(url);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        } catch (error) {
-          console.error(error);
-        }
-      }
+    if (response.statusCode !== 200) {
+      throw new Error(response.body);
+    }
+
+    return response.body;
+  }
+
+  async function setRules() {
+    const data = {
+      add: rules,
+    };
+
+    const response = await needle("post", rulesURL, data, {
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
     });
-  });*/
+
+    if (response.statusCode !== 201) {
+      throw new Error(response.body);
+    }
+
+    return response.body;
+  }
+
+  function streamConnect(retryAttempt) {
+    const stream = needle.get(streamURL, {
+      headers: {
+        "User-Agent": "v2FilterStreamJS",
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 20000,
+    });
+
+    stream
+      .on("data", (data) => {
+        try {
+          const json = JSON.parse(data);
+          // A successful connection resets retry count.
+          retryAttempt = 0;
+        } catch (e) {
+          if (
+            data.detail ===
+            "This stream is currently at the maximum allowed connection limit."
+          ) {
+            console.log(data.detail);
+            process.exit(1);
+          } else {
+            // Keep alive signal received. Do nothing.
+          }
+        }
+      })
+      .on("err", (error) => {
+        if (error.code !== "ECONNRESET") {
+          console.log(error.code);
+          process.exit(1);
+        } else {
+          setTimeout(() => {
+            console.warn("A connection error occurred. Reconnecting...");
+            streamConnect(++retryAttempt);
+          }, 2 ** retryAttempt);
+        }
+      });
+
+    return stream;
+  }
+
+  let currentRules;
+
+  try {
+    currentRules = await getAllRules();
+    await deleteAllRules(currentRules);
+    await setRules();
+    streamConnect(0);
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 module.exports = {
