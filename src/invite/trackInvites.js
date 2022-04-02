@@ -6,6 +6,8 @@ const trackInvites = () => {
     intents: [
       Discord.Intents.FLAGS.GUILDS,
       Discord.Intents.FLAGS.GUILD_MESSAGES,
+      Discord.Intents.FLAGS.GUILD_MEMBERS,
+      Discord.Intents.FLAGS.GUILD_PRESENCES,
     ],
   });
   bot.login(process.env.DISCORD_TOKEN);
@@ -13,24 +15,33 @@ const trackInvites = () => {
   bot.on("ready", () => {
     console.log("Invite tracker bot is ready to use!");
     bot.guilds.cache.forEach(async (guild) => {
-      const firstInvites = await guild.invites.fetch();
-      firstInvites.map(async (invite) => {
-        await inviteModel.findOneAndUpdate(
-          { inviterId: invite.inviterId, guildId: guild.id, code: invite.code },
-          {
-            inviterId: invite.inviterId,
-            inviterName: invite.inviter?.username,
-            guildId: guild.id,
-            code: invite.code,
-            inviteCount: invite.uses,
-          },
-          { upsert: true }
-        );
-      });
+      const firstInvites = await guild.invites?.fetch();
+      if (firstInvites) {
+        firstInvites.map(async (invite) => {
+          await inviteModel.findOneAndUpdate(
+            {
+              inviterId: invite.inviterId,
+              guildId: guild.id,
+              code: invite.code,
+            },
+            {
+              inviterId: invite.inviterId,
+              inviterName: invite.inviter?.username,
+              guildId: guild.id,
+              code: invite.code,
+              inviteCount: invite.uses,
+            },
+            { upsert: true }
+          );
+        });
+      } else {
+        console.error("firstInvites could not be found");
+      }
     });
   });
 
   bot.on("inviteDelete", (invite) => {
+    console.log("inviteDelete!");
     if (invite?.guild?.id && invite.code) {
       inviteModel.findOneAndDelete({
         guildId: invite.guild.id,
@@ -42,6 +53,7 @@ const trackInvites = () => {
   });
 
   bot.on("inviteCreate", (invite) => {
+    console.log("inviteCreate!");
     if (invite.inviter?.id && invite.guild?.id && invite.uses) {
       inviteModel.create({
         inviterId: invite.inviterId,
@@ -75,47 +87,75 @@ const trackInvites = () => {
 
   bot.on("guildMemberAdd", async (member) => {
     const currentInvites = await member.guild?.invites?.fetch();
-    const existingInvites = await inviteModel.find({
-      guildId: member.guild?.id,
+    const invite = currentInvites.find(async (i) => {
+      const invite = await inviteModel.findOne({ code: i.code });
+      if (i.code === invite.code) {
+        return i;
+      }
     });
-
-    const invite = currentInvites.find(
-      (i) => i.inviteCount > existingInvites.get(i.code)
-    );
     const inviter = await bot.users.fetch(invite.inviter?.id);
-    const logChannel = member.guild.channels.cache.find(
-      (channel) =>
-        channel.name === process.env.DISCORD_INVITE_TRACKER_CHANNEL_NAME
-    );
+
     if (inviter) {
-      await inviteModel.create({
-        inviterId: invite.inviterId,
-        inviterName: invite.inviter?.username,
+      const theInvite = await inviteModel.findOne({
         guildId: member.guild.id,
         code: invite.code,
-        inviteCount: invite.uses,
       });
-      if (logChannel) {
-        logChannel.send(
+      await inviteModel.findOneAndUpdate(
+        {
+          guildId: member.guild.id,
+          code: invite.code,
+        },
+        {
+          inviteCount: theInvite.inviteCount + 1,
+        }
+      );
+      const inviteTrackerChannel = await bot?.channels?.cache?.get(
+        process.env.DISCORD_INVITE_TRACKER_CHANNEL_ID
+      );
+      if (inviteTrackerChannel) {
+        inviteTrackerChannel.send(
           `${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times.`
         );
-      } else {
-        console.error("logChannel could not be found");
       }
-    }
-
-    if (!inviter) {
-      console.error("Inviter could not be found");
-      const infoChannel = member.guild?.channels?.cache?.find(
-        (channel) => channel.name === process.env.DISCORD_BOT_INFO_CHANNEL_NAME
+    } else {
+      console.error("Inviter could not be found \n");
+      const botInfoChannel = await bot?.channels?.cache?.get(
+        process.env.DISCORD_BOT_INFO_CHANNEL_ID
       );
-      if (infoChannel) {
-        infoChannel.send(
+      if (botInfoChannel) {
+        botInfoChannel.send(
           `${member.user.tag} joined but I couldn't find through which invite.`
         );
-      } else {
-        console.error("infoChannel could not be found");
       }
+    }
+  });
+
+  bot.on("guildMemberRemove", async (member) => {
+    const currentInvites = await member.guild?.invites?.fetch();
+    const invite = currentInvites.find(async (i) => {
+      const invite = await inviteModel.findOne({ code: i.code });
+      if (i.uses > invite.inviteCount) {
+        return i;
+      }
+    });
+
+    const inviter = await bot.users.fetch(invite.inviter?.id);
+    if (inviter) {
+      const theInvite = await inviteModel.findOne({
+        guildId: member.guild.id,
+        code: invite.code,
+      });
+      await inviteModel.findOneAndUpdate(
+        {
+          inviterId: invite.inviterId,
+          inviterName: invite.inviter?.username,
+          guildId: member.guild.id,
+          code: invite.code,
+        },
+        {
+          inviteCount: theInvite.inviteCount - 1,
+        }
+      );
     }
   });
 };

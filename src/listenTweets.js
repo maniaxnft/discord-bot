@@ -16,6 +16,8 @@ const listenTweets = async () => {
     intents: [
       Discord.Intents.FLAGS.GUILDS,
       Discord.Intents.FLAGS.GUILD_MESSAGES,
+      Discord.Intents.FLAGS.GUILD_MEMBERS,
+      Discord.Intents.FLAGS.GUILD_PRESENCES,
     ],
   });
   bot.login(process.env.DISCORD_TOKEN);
@@ -87,7 +89,9 @@ const sendTweetToChannel = async (bot, tweet) => {
     const tweetURL = `https://twitter.com/${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}/status/${tweet?.data?.id}`;
     channel.send(`${tweetURL}`);
   } else {
-    console.log("Channel undefined OR tweet is in wrong format or undefined");
+    console.log(
+      "Channel undefined OR tweet is in wrong format or undefined \n"
+    );
   }
 };
 
@@ -98,7 +102,7 @@ const getAllRules = async () => {
     },
   });
   if (response.statusCode !== 200) {
-    console.log("Error:", response.statusMessage, response.statusCode);
+    console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
     throw new Error(response.body);
   }
   return response.body;
