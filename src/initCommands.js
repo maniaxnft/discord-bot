@@ -3,6 +3,7 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const Discord = require("discord.js");
 const axios = require("axios");
+const getTop10Invites = require("./invite/getTop10invites");
 
 const initCommands = async () => {
   const clientId = process.env.DISCORD_CLIENT_ID;
@@ -57,22 +58,23 @@ const listenCommands = () => {
 
     const { commandName } = interaction;
     if (commandName === "m-ping" && isAdmin) {
-      await interaction.reply("Pong!");
+      await interaction.reply(">>> Pong!");
     } else if (commandName === "m-server" && isAdmin) {
       await interaction.reply(
-        `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
+        `>>> Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
       );
     } else if (commandName === "m-invites" && isAdmin) {
-      await interaction.reply("Going to show top 10 invites");
+      const invites = await getTop10Invites(interaction.guild?.id);
+      await interaction.reply(`>>> ${JSON.stringify(invites, null, 2)}`);
     } else if (commandName === "avaxprice") {
       const price = await getAvaxPrice();
       if (price) {
-        await interaction.reply(price);
+        await interaction.reply(`>>> ${price}`);
       } else {
-        await interaction.reply("Can't get price for now.");
+        await interaction.reply(">>> Can't get price for now.");
       }
     } else {
-      await interaction.reply("Resolver for this command does not found");
+      await interaction.reply(">>> Resolver for this command does not found");
     }
   });
 };

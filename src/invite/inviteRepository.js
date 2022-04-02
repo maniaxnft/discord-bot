@@ -5,7 +5,7 @@ const inviteSchema = mongoose.Schema({
   inviterName: String,
   guildId: String,
   code: String,
-  inviteCount: String,
+  uses: String,
 });
 const inviteModel = mongoose.model("invite", inviteSchema);
 

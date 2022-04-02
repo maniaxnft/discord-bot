@@ -1,6 +1,8 @@
 const Discord = require("discord.js");
 const { inviteModel } = require("./inviteRepository");
 
+const wait = require("timers/promises").setTimeout;
+
 const trackInvites = () => {
   const bot = new Discord.Client({
     intents: [
@@ -12,32 +14,10 @@ const trackInvites = () => {
   });
   bot.login(process.env.DISCORD_TOKEN);
 
-  bot.on("ready", () => {
+  bot.on("ready", async () => {
+    await wait(1000);
     console.log("Invite tracker bot is ready to use!");
-    bot.guilds.cache.forEach(async (guild) => {
-      const firstInvites = await guild.invites?.fetch();
-      if (firstInvites) {
-        firstInvites.map(async (invite) => {
-          await inviteModel.findOneAndUpdate(
-            {
-              inviterId: invite.inviterId,
-              guildId: guild.id,
-              code: invite.code,
-            },
-            {
-              inviterId: invite.inviterId,
-              inviterName: invite.inviter?.username,
-              guildId: guild.id,
-              code: invite.code,
-              inviteCount: invite.uses,
-            },
-            { upsert: true }
-          );
-        });
-      } else {
-        console.error("firstInvites could not be found");
-      }
-    });
+    initInvites(bot);
   });
 
   bot.on("inviteDelete", (invite) => {
@@ -53,14 +33,13 @@ const trackInvites = () => {
   });
 
   bot.on("inviteCreate", (invite) => {
-    console.log("inviteCreate!");
     if (invite.inviter?.id && invite.guild?.id && invite.uses) {
       inviteModel.create({
         inviterId: invite.inviterId,
         inviterName: invite.inviter?.username,
         guildId: invite.guild.id,
         code: invite.code,
-        inviteCount: invite.uses,
+        uses: invite.uses,
       });
     } else {
       console.error("Necessary parameters not coming for inviteCreate");
@@ -75,7 +54,7 @@ const trackInvites = () => {
           inviterName: invite.inviter?.username,
           guildId: invite.guild.id,
           code: invite.code,
-          inviteCount: invite.uses,
+          uses: invite.uses,
         });
       });
     });
@@ -85,77 +64,35 @@ const trackInvites = () => {
     inviteModel.deleteMany({ guildId: guild.id });
   });
 
-  bot.on("guildMemberAdd", async (member) => {
-    const currentInvites = await member.guild?.invites?.fetch();
-    const invite = currentInvites.find(async (i) => {
-      const invite = await inviteModel.findOne({ code: i.code });
-      if (i.code === invite.code) {
-        return i;
-      }
-    });
-    const inviter = await bot.users.fetch(invite.inviter?.id);
-
-    if (inviter) {
-      const theInvite = await inviteModel.findOne({
-        guildId: member.guild.id,
-        code: invite.code,
-      });
-      await inviteModel.findOneAndUpdate(
-        {
-          guildId: member.guild.id,
-          code: invite.code,
-        },
-        {
-          inviteCount: theInvite.inviteCount + 1,
-        }
-      );
-      const inviteTrackerChannel = await bot?.channels?.cache?.get(
-        process.env.DISCORD_INVITE_TRACKER_CHANNEL_ID
-      );
-      if (inviteTrackerChannel) {
-        inviteTrackerChannel.send(
-          `${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times.`
-        );
-      }
-    } else {
-      console.error("Inviter could not be found \n");
-      const botInfoChannel = await bot?.channels?.cache?.get(
-        process.env.DISCORD_BOT_INFO_CHANNEL_ID
-      );
-      if (botInfoChannel) {
-        botInfoChannel.send(
-          `${member.user.tag} joined but I couldn't find through which invite.`
-        );
-      }
-    }
+  bot.on("guildMemberAdd", async () => {
+    await wait(1000);
+    initInvites(bot);
   });
+};
 
-  bot.on("guildMemberRemove", async (member) => {
-    const currentInvites = await member.guild?.invites?.fetch();
-    const invite = currentInvites.find(async (i) => {
-      const invite = await inviteModel.findOne({ code: i.code });
-      if (i.uses > invite.inviteCount) {
-        return i;
-      }
-    });
-
-    const inviter = await bot.users.fetch(invite.inviter?.id);
-    if (inviter) {
-      const theInvite = await inviteModel.findOne({
-        guildId: member.guild.id,
-        code: invite.code,
+const initInvites = (bot) => {
+  bot.guilds.cache.forEach(async (guild) => {
+    const firstInvites = await guild.invites?.fetch();
+    if (firstInvites) {
+      firstInvites.map(async (invite) => {
+        await inviteModel.findOneAndUpdate(
+          {
+            inviterId: invite.inviterId,
+            guildId: guild.id,
+            code: invite.code,
+          },
+          {
+            inviterId: invite.inviterId,
+            inviterName: invite.inviter?.username,
+            guildId: guild.id,
+            code: invite.code,
+            uses: invite.uses,
+          },
+          { upsert: true }
+        );
       });
-      await inviteModel.findOneAndUpdate(
-        {
-          inviterId: invite.inviterId,
-          inviterName: invite.inviter?.username,
-          guildId: member.guild.id,
-          code: invite.code,
-        },
-        {
-          inviteCount: theInvite.inviteCount - 1,
-        }
-      );
+    } else {
+      console.error("firstInvites could not be found");
     }
   });
 };
