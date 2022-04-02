@@ -4,7 +4,7 @@ const { Routes } = require("discord-api-types/v9");
 const Discord = require("discord.js");
 const axios = require("axios");
 
-const initCommands = () => {
+const initCommands = async () => {
   const clientId = process.env.DISCORD_CLIENT_ID;
   const guildId = process.env.DISCORD_GUILD_ID;
   const token = process.env.DISCORD_TOKEN;
@@ -26,12 +26,15 @@ const initCommands = () => {
 
   const rest = new REST({ version: "9" }).setToken(token);
 
-  rest
-    .put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
-    .then(() => console.log("Successfully registered application commands."))
-    .catch(console.error);
-
-  listenCommands();
+  try {
+    await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+      body: commands,
+    });
+    console.log("Successfully registered application commands.");
+    listenCommands();
+  } catch (e) {
+    throw new Error(e);
+  }
 };
 
 const listenCommands = () => {
@@ -63,11 +66,11 @@ const listenCommands = () => {
       await interaction.reply("Going to show top 10 invites");
     } else if (commandName === "avaxprice") {
       const price = await getAvaxPrice();
-      if (!price) {
+      if (price) {
+        await interaction.reply(price);
+      } else {
         await interaction.reply("Can't get price for now.");
-        return;
       }
-      await interaction.reply(price);
     } else {
       await interaction.reply("Resolver for this command does not found");
     }

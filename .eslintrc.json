@@ -11,6 +11,7 @@
     },
     "rules": {
       //* Avoid Bugs
+      "require-await": "error",
       "no-undef": "error",
       "semi": "error",
       "semi-spacing": "error",

@@ -1,16 +1,20 @@
 const mongoose = require("mongoose");
 
 const init = async () => {
-  checkEnvVars();
-  await connectToMongo();
+  try {
+    checkEnvVars();
+    await connectToMongo();
+  } catch (e) {
+    throw new Error(e);
+  }
 };
 
 const connectToMongo = async () => {
   try {
     await mongoose.connect(`mongodb://localhost:27017/${process.env.APP_NAME}`);
+    console.log("Successfully connected to mongodb!");
   } catch (e) {
-    console.log(e);
-    process.exit(1);
+    throw new Error(e);
   }
 };
 
