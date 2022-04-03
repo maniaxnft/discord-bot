@@ -1,7 +1,6 @@
 const Discord = require("discord.js");
+const { wait } = require("../utils");
 const { inviteModel } = require("./inviteRepository");
-
-const wait = require("timers/promises").setTimeout;
 
 const trackInvites = () => {
   const bot = new Discord.Client({
@@ -20,8 +19,8 @@ const trackInvites = () => {
     initInvites(bot);
   });
 
-  bot.on("inviteDelete", (invite) => {
-    console.log("inviteDelete!");
+  bot.on("inviteDelete", async (invite) => {
+    await wait(1000);
     if (invite?.guild?.id && invite.code) {
       inviteModel.findOneAndDelete({
         guildId: invite.guild.id,
@@ -32,7 +31,8 @@ const trackInvites = () => {
     }
   });
 
-  bot.on("inviteCreate", (invite) => {
+  bot.on("inviteCreate", async (invite) => {
+    await wait(1000);
     if (invite.inviter?.id && invite.guild?.id && invite.uses) {
       inviteModel.create({
         inviterId: invite.inviterId,
@@ -46,7 +46,8 @@ const trackInvites = () => {
     }
   });
 
-  bot.on("guildCreate", (guild) => {
+  bot.on("guildCreate", async (guild) => {
+    await wait(1000);
     guild.invites.fetch().then((guildInvites) => {
       guildInvites.map((invite) => {
         inviteModel.create({
@@ -60,7 +61,8 @@ const trackInvites = () => {
     });
   });
 
-  bot.on("guildDelete", (guild) => {
+  bot.on("guildDelete", async (guild) => {
+    await wait(1000);
     inviteModel.deleteMany({ guildId: guild.id });
   });
 

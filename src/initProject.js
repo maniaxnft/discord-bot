@@ -32,6 +32,10 @@ const checkEnvVars = () => {
   const var10 = process.env.TWITTER_CONSUMER_SECRET;
   const var13 = process.env.TWITTER_BEARER_TOKEN;
   const var12 = process.env.TWITTER_OFFICIAL_CHANNEL_NAME;
+  const var16 = process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID;
+  const var14 = process.env.DISCORD_BOT_COUNT_CHANNEL_ID;
+  const var15 = process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID;
+
   if (
     !var1 ||
     !var2 ||
@@ -45,6 +49,9 @@ const checkEnvVars = () => {
     !varr7 ||
     !var12 ||
     !var13 ||
+    !var16 ||
+    !var14 ||
+    !var15 ||
     !var11
   ) {
     console.log("Some of the env var(s) is(are) missing");
