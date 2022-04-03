@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { wait } = require("./utils");
+const { wait } = require("../utils");
 const needle = require("needle");
 
 const showServerStats = () => {

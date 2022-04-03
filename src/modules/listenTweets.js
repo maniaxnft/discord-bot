@@ -150,6 +150,4 @@ const setRules = async () => {
   return response.body;
 };
 
-module.exports = {
-  listenTweets,
-};
+module.exports = listenTweets;
