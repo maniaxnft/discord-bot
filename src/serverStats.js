@@ -41,7 +41,12 @@ const updateStats = async (member, bot) => {
     process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
   );
 
-  const followerCount = await getTwitterFollowerCount();
+  let followerCount = 0;
+  try {
+    followerCount = await getTwitterFollowerCount();
+  } catch (e) {
+    console.error(e);
+  }
   const botCount = member.guild.members.cache.filter((m) => m.user.bot).size;
 
   memberCountChannel.setName(
@@ -62,15 +67,19 @@ const updateStats = async (member, bot) => {
 };
 
 const getTwitterFollowerCount = async () => {
-  const response = await needle(
-    "get",
-    `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}`
-  );
-  if (response.statusCode !== 200) {
-    console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
-    throw new Error(response.body);
+  try {
+    const response = await needle(
+      "get",
+      `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}`
+    );
+    if (response.statusCode !== 200) {
+      console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
+      throw new Error(response.body);
+    }
+    return response?.body[0]?.followers_count;
+  } catch (e) {
+    throw new Error(e);
   }
-  return response?.body[0]?.followers_count;
 };
 
 module.exports = showServerStats;
