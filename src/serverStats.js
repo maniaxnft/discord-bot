@@ -41,12 +41,12 @@ const updateStats = async (member, bot) => {
 
   memberCountChannel.setName(
     `🌍 | All Members: ${
-      member.guild.members.cache.filter((m) => !m.user.bot).size
+      member.guild.members.cache.filter((m) => !m.user.bot).size - botCount
     }`
   );
   botCountChannel.setName(`🤖 | Bot Count: ${botCount}`);
   onlineUsersCountChannel.setName(
-    `🟢 | Online Users: ${
+    `🟢 | Online Members: ${
       bot.guilds.cache
         .get(process.env.DISCORD_GUILD_ID)
         .members?.cache?.filter((m) => m.presence?.status === "online").size -
