@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const { wait } = require("./utils");
+const needle = require("needle");
 
 const showServerStats = () => {
   const bot = new Discord.Client({
@@ -36,7 +37,11 @@ const updateStats = async (member, bot) => {
   const onlineUsersCountChannel = await bot.channels.cache.get(
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
   );
+  const twitterFollowerCountChannel = await bot.channels.cache.get(
+    process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
+  );
 
+  const followerCount = await getTwitterFollowerCount();
   const botCount = member.guild.members.cache.filter((m) => m.user.bot).size;
 
   memberCountChannel.setName(
@@ -53,6 +58,19 @@ const updateStats = async (member, bot) => {
       botCount
     }`
   );
+  twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
+};
+
+const getTwitterFollowerCount = async () => {
+  const response = await needle(
+    "get",
+    `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}`
+  );
+  if (response.statusCode !== 200) {
+    console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
+    throw new Error(response.body);
+  }
+  return response?.body[0]?.followers_count;
 };
 
 module.exports = showServerStats;

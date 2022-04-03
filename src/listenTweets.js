@@ -4,6 +4,7 @@ const needle = require("needle");
 const token = process.env.TWITTER_BEARER_TOKEN;
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
+
 const rules = [
   {
     value: `from:${process.env.TWITTER_OFFICIAL_CHANNEL_NAME} -is:retweet`,
@@ -149,4 +150,6 @@ const setRules = async () => {
   return response.body;
 };
 
-module.exports = listenTweets;
+module.exports = {
+  listenTweets,
+};

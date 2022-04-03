@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const initProject = require("./initProject");
 const initCommands = require("./initCommands");
-const listenTweets = require("./listenTweets");
+const { listenTweets } = require("./listenTweets");
 const trackInvites = require("./invite/trackInvites");
 const showServerStats = require("./serverStats");
 
