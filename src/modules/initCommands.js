@@ -1,8 +1,10 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
+const { MessageEmbed } = require("discord.js");
 const { Routes } = require("discord-api-types/v9");
 const axios = require("axios");
 const { getTop10Invites } = require("./trackInvites");
+const { wait } = require("../utils");
 
 const initCommands = async (bot) => {
   const clientId = process.env.DISCORD_CLIENT_ID;
@@ -44,21 +46,25 @@ const listenCommands = (bot) => {
 
   bot.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
-    const isAdmin = interaction?.member?.roles?.cache?.map(
+    let isAdmin = interaction?.member?.roles?.cache?.map(
       (role) => role.name === process.env.DISCORD_ADMIN_ROLE_NAME
     );
-
+    if (Array.isArray(isAdmin)) {
+      isAdmin = isAdmin[0];
+    }
     const { commandName } = interaction;
-    if (commandName === "m-ping" && isAdmin) {
+
+    if (commandName === "m-ping") {
       await interaction.reply(">>> Pong!");
-    } else if (commandName === "m-server" && isAdmin) {
+    } else if (commandName === "m-server" && isAdmin === true) {
       await interaction.reply(
         `>>> Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
       );
-    } else if (commandName === "m-invites" && isAdmin) {
+    } else if (commandName === "m-invites") {
       const invites = await getTop10Invites(bot);
-      await interaction.reply(`>>> ${JSON.stringify(invites, null, 2)}`);
+      await interaction.reply(leaderBoard(invites));
     } else if (commandName === "m-avax") {
+      await wait(300);
       const price = await getAvaxPrice();
       if (price) {
         await interaction.reply(`>>> ${price}`);
@@ -69,6 +75,16 @@ const listenCommands = (bot) => {
       await interaction.reply(">>> Resolver for this command does not found");
     }
   });
+};
+
+const leaderBoard = (invites) => {
+  let str =
+    ">>>        **Leaderboard**\n \n **Name**                **Invited**\n";
+  invites.map(({ username, uses }) => {
+    str = `${str}${username}               ${uses}\n`;
+  });
+
+  return str;
 };
 
 const getAvaxPrice = async () => {

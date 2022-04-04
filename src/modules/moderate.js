@@ -6,7 +6,7 @@ const moderate = (bot) => {
   });
 
   bot.on("messageCreate", async (message) => {
-    await wait(500);
+    await wait(300);
     const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
     const member = await guild?.members?.fetch(message.author.id);
     const isAdmin = member?.roles?.cache?.has(

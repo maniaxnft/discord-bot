@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const init = async () => {
+const init = () => {
   try {
     checkEnvVars();
-    await connectToMongo();
+    // await connectToMongo();
   } catch (e) {
     throw new Error(e);
   }
@@ -20,7 +20,7 @@ const connectToMongo = async () => {
 
 const checkEnvVars = () => {
   const envArray = [
-    process.env.MONGO_URL,
+    // process.env.MONGO_URL,
     process.env.DISCORD_TOKEN,
     process.env.DISCORD_CLIENT_ID,
     process.env.DISCORD_GUILD_ID,
