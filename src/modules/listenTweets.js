@@ -11,20 +11,12 @@ const rules = [
   },
 ];
 
-const listenTweets = async () => {
+const listenTweets = async (bot) => {
   let currentRules;
-  const bot = new Discord.Client({
-    intents: [
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES,
-      Discord.Intents.FLAGS.GUILD_MEMBERS,
-      Discord.Intents.FLAGS.GUILD_PRESENCES,
-    ],
-  });
-  bot.login(process.env.DISCORD_TOKEN);
   bot.once("ready", () => {
     console.log("Twitter bot is ready to use!");
   });
+
   const channel = await bot.channels.cache.get(
     process.env.DISCORD_BOT_INFO_CHANNEL_ID
   );

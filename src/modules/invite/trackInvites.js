@@ -1,18 +1,7 @@
-const Discord = require("discord.js");
 const { wait } = require("../../utils");
 const { inviteModel } = require("./inviteRepository");
 
-const trackInvites = () => {
-  const bot = new Discord.Client({
-    intents: [
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES,
-      Discord.Intents.FLAGS.GUILD_MEMBERS,
-      Discord.Intents.FLAGS.GUILD_PRESENCES,
-    ],
-  });
-  bot.login(process.env.DISCORD_TOKEN);
-
+const trackInvites = (bot) => {
   bot.on("ready", async () => {
     await wait(1000);
     console.log("Invite tracker bot is ready to use!");

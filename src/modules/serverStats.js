@@ -2,16 +2,7 @@ const Discord = require("discord.js");
 const { wait } = require("../utils");
 const needle = require("needle");
 
-const showServerStats = () => {
-  const bot = new Discord.Client({
-    intents: [
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES,
-      Discord.Intents.FLAGS.GUILD_MEMBERS,
-      Discord.Intents.FLAGS.GUILD_PRESENCES,
-    ],
-  });
-  bot.login(process.env.DISCORD_TOKEN);
+const showServerStats = (bot) => {
   bot.once("ready", () => {
     console.log("Server stats bot is ready to use!");
   });

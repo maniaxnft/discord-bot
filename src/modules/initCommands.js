@@ -5,7 +5,7 @@ const Discord = require("discord.js");
 const axios = require("axios");
 const getTop10Invites = require("./invite/getTop10invites");
 
-const initCommands = async () => {
+const initCommands = async (bot) => {
   const clientId = process.env.DISCORD_CLIENT_ID;
   const guildId = process.env.DISCORD_GUILD_ID;
   const token = process.env.DISCORD_TOKEN;
@@ -32,20 +32,13 @@ const initCommands = async () => {
       body: commands,
     });
     console.log("Successfully registered application commands.");
-    listenCommands();
+    listenCommands(bot);
   } catch (e) {
     throw new Error(e);
   }
 };
 
-const listenCommands = () => {
-  const bot = new Discord.Client({
-    intents: [
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES,
-    ],
-  });
-  bot.login(process.env.DISCORD_TOKEN);
+const listenCommands = (bot) => {
   bot.once("ready", () => {
     console.log("Command bot is ready to use!");
   });

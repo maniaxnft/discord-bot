@@ -1,28 +1,31 @@
-const Discord = require("discord.js");
 const { wait } = require("../utils");
 
-const moderate = () => {
-  const bot = new Discord.Client({
-    intents: [
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES,
-      Discord.Intents.FLAGS.GUILD_MEMBERS,
-      Discord.Intents.FLAGS.GUILD_PRESENCES,
-    ],
-  });
-  bot.login(process.env.DISCORD_TOKEN);
-
+const moderate = (bot) => {
   bot.on("ready", async () => {
     await wait(1000);
     console.log("Moderator bot is ready to use!");
   });
 
-  bot.on("message", (message) => {
+  bot.on("messageCreate", async (message) => {
+    await wait(500);
+    const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
+    const member = await guild?.members?.fetch(message.author.id);
+    const isAdmin = member?.roles?.cache?.has(
+      process.env.DISCORD_ADMIN_ROLE_ID
+    );
+
     if (
-      message.guildId === process.env.DISCORD_COMMAND_ONLY_CHANNEL &&
+      message.channelId === process.env.DISCORD_COMMAND_ONLY_CHANNEL &&
       message.interaction?.type !== "APPLICATION_COMMAND"
     ) {
-      message.delete(); // Deletes the message
+      message.delete();
+    }
+    if (
+      message.channelId !== process.env.DISCORD_COMMAND_ONLY_CHANNEL &&
+      message.interaction?.type === "APPLICATION_COMMAND" &&
+      !isAdmin
+    ) {
+      message.delete();
     }
   });
 };
