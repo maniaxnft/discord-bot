@@ -13,7 +13,7 @@ const boot = async () => {
     await initProject();
     const bot = await initBot();
     await initCommands(bot);
-    await listenTweets(bot);
+    // await listenTweets(bot);
     showServerStats(bot);
     trackInvites(bot);
     moderate(bot);
