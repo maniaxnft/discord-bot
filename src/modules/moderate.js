@@ -1,8 +1,7 @@
 const { wait } = require("../utils");
 
 const moderate = (bot) => {
-  bot.on("ready", async () => {
-    await wait(1000);
+  bot.on("ready", () => {
     console.log("Moderator bot is ready to use!");
   });
 

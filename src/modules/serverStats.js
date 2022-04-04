@@ -18,42 +18,53 @@ const showServerStats = (bot) => {
 };
 
 const updateStats = async (member, bot) => {
-  const memberCountChannel = await bot.channels.cache.get(
+  const memberCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID
   );
-  const botCountChannel = await bot.channels.cache.get(
+  const botCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_BOT_COUNT_CHANNEL_ID
   );
-  const onlineUsersCountChannel = await bot.channels.cache.get(
+  const onlineUsersCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
   );
-  const twitterFollowerCountChannel = await bot.channels.cache.get(
+  const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
   );
 
-  let followerCount = 0;
+  let followerCount = undefined;
   try {
     followerCount = await getTwitterFollowerCount();
   } catch (e) {
     console.error(e);
   }
-  const botCount = member.guild.members.cache.filter((m) => m.user.bot).size;
+  const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
+  const onlineUsers =
+    bot.guilds?.cache
+      ?.get(process.env.DISCORD_GUILD_ID)
+      .members?.cache?.filter((m) => m.presence?.status === "online").size -
+    botCount;
 
   memberCountChannel.setName(
     `🌍 | Members: ${
       member.guild.members.cache.filter((m) => !m.user.bot).size - botCount
     }`
   );
-  botCountChannel.setName(`🤖 | Bots: ${botCount}`);
-  onlineUsersCountChannel.setName(
-    `🟢 | Online: ${
-      bot.guilds.cache
-        .get(process.env.DISCORD_GUILD_ID)
-        .members?.cache?.filter((m) => m.presence?.status === "online").size -
-      botCount
-    }`
-  );
-  twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
+  if (botCount && botCountChannel) {
+    botCountChannel.setName(`🤖 | Bots: ${botCount}`);
+  }
+  if (onlineUsers && onlineUsersCountChannel) {
+    onlineUsersCountChannel.setName(
+      `🟢 | Online: ${
+        bot.guilds.cache
+          .get(process.env.DISCORD_GUILD_ID)
+          .members?.cache?.filter((m) => m.presence?.status === "online").size -
+        botCount
+      }`
+    );
+  }
+  if (followerCount && twitterFollowerCountChannel) {
+    twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
+  }
 };
 
 const getTwitterFollowerCount = async () => {

@@ -1,9 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const Discord = require("discord.js");
 const axios = require("axios");
-const getTop10Invites = require("./invite/getTop10invites");
+const { getTop10Invites } = require("./trackInvites");
 
 const initCommands = async (bot) => {
   const clientId = process.env.DISCORD_CLIENT_ID;
@@ -21,7 +20,7 @@ const initCommands = async (bot) => {
       .setName("m-invites")
       .setDescription("Shows top 10 inviters"),
     new SlashCommandBuilder()
-      .setName("avaxprice")
+      .setName("m-avax")
       .setDescription("Shows current AVAX price"),
   ].map((command) => command.toJSON());
 
@@ -57,9 +56,9 @@ const listenCommands = (bot) => {
         `>>> Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
       );
     } else if (commandName === "m-invites" && isAdmin) {
-      const invites = await getTop10Invites(interaction.guild?.id);
+      const invites = await getTop10Invites(bot);
       await interaction.reply(`>>> ${JSON.stringify(invites, null, 2)}`);
-    } else if (commandName === "avaxprice") {
+    } else if (commandName === "m-avax") {
       const price = await getAvaxPrice();
       if (price) {
         await interaction.reply(`>>> ${price}`);

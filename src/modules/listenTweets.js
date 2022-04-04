@@ -1,4 +1,3 @@
-const Discord = require("discord.js");
 const needle = require("needle");
 
 const token = process.env.TWITTER_BEARER_TOKEN;
