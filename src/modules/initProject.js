@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 
 const init = () => {
   try {
@@ -9,14 +9,14 @@ const init = () => {
   }
 };
 
-const connectToMongo = async () => {
+/*const connectToMongo = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Successfully connected to mongodb!");
   } catch (e) {
     throw new Error(e);
   }
-};
+};*/
 
 const checkEnvVars = () => {
   const envArray = [

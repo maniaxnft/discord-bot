@@ -1,11 +1,12 @@
 require("dotenv").config();
 
-const initProject = require("./initProject");
+const initProject = require("./modules/initProject");
 const initBot = require("./modules/initBot");
 const initCommands = require("./modules/initCommands");
 const listenTweets = require("./modules/listenTweets");
 const showServerStats = require("./modules/serverStats");
 const moderate = require("./modules/moderate");
+
 const { sendErrorToLogChannel } = require("./utils");
 
 const boot = async () => {
