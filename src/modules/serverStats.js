@@ -15,6 +15,11 @@ const showServerStats = (bot) => {
     await wait(1000);
     updateStats(member, bot);
   });
+
+  bot.on("presenceUpdate", async (oldMember, newMember) => {
+    await wait(1000);
+    updateStats(newMember, bot);
+  });
 };
 
 const updateStats = async (member, bot) => {
@@ -45,11 +50,14 @@ const updateStats = async (member, bot) => {
       .members?.cache?.filter((m) => m.presence?.status === "online").size -
     botCount;
 
-  memberCountChannel.setName(
-    `🌍 | Members: ${
-      member.guild.members.cache.filter((m) => !m.user.bot).size - botCount
-    }`
-  );
+  if (botCount && memberCountChannel) {
+    memberCountChannel.setName(
+      `🌍 | Members: ${
+        member.guild?.members?.cache?.filter((m) => !m.user.bot).size - botCount
+      }`
+    );
+  }
+
   if (botCount && botCountChannel) {
     botCountChannel.setName(`🤖 | Bots: ${botCount}`);
   }
