@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
-const { MessageEmbed } = require("discord.js");
 const { Routes } = require("discord-api-types/v9");
 const axios = require("axios");
 const { getTop10Invites } = require("./trackInvites");
@@ -27,7 +26,6 @@ const initCommands = async (bot) => {
   ].map((command) => command.toJSON());
 
   const rest = new REST({ version: "9" }).setToken(token);
-
   try {
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: commands,

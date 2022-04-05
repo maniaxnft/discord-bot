@@ -1,4 +1,5 @@
 const needle = require("needle");
+const { sendErrorToLogChannel } = require("../utils");
 
 const token = process.env.TWITTER_BEARER_TOKEN;
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
@@ -16,17 +17,13 @@ const listenTweets = async (bot) => {
     console.log("Twitter bot is ready to use!");
   });
 
-  const channel = await bot.channels.cache.get(
-    process.env.DISCORD_BOT_INFO_CHANNEL_ID
-  );
-
   try {
     currentRules = await getAllRules();
     await deleteAllRules(currentRules);
     await setRules(currentRules);
     streamConnect(bot, 0);
   } catch (e) {
-    channel.send("Error while listening tweets: ", e);
+    sendErrorToLogChannel(bot, "Error while listening tweets: ", e);
     console.error(e);
   }
 };
@@ -53,6 +50,7 @@ const streamConnect = (bot, retryAttempt) => {
           "This stream is currently at the maximum allowed connection limit."
         ) {
           console.log(data.detail);
+          sendErrorToLogChannel(bot, data.detail, e);
         } else {
           // Keep alive signal received. Do nothing.
         }

@@ -6,16 +6,19 @@ const initCommands = require("./modules/initCommands");
 const listenTweets = require("./modules/listenTweets");
 const showServerStats = require("./modules/serverStats");
 const moderate = require("./modules/moderate");
+const { sendErrorToLogChannel } = require("./utils");
 
 const boot = async () => {
+  let bot = undefined;
   try {
     await initProject();
-    const bot = await initBot();
+    bot = await initBot();
     await initCommands(bot);
     await listenTweets(bot);
     showServerStats(bot);
     moderate(bot);
   } catch (e) {
+    sendErrorToLogChannel(bot, "Error on boot: ", e);
     throw new Error(e);
   }
 };

@@ -1,4 +1,4 @@
-const { wait } = require("../utils");
+const { wait, sendErrorToLogChannel } = require("../utils");
 const needle = require("needle");
 
 const showServerStats = (bot) => {
@@ -35,6 +35,7 @@ const updateStats = async (member, bot) => {
   try {
     followerCount = await getTwitterFollowerCount();
   } catch (e) {
+    sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
     console.error(e);
   }
   const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
