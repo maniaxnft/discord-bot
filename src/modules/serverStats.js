@@ -8,7 +8,7 @@ const showServerStats = (bot) => {
 
   bot.on("guildMemberAdd", async (member) => {
     await wait(1000);
-    updateStats(member, bot);
+    updateStats(member, bot, "guildMemberAdd");
   });
 
   bot.on("guildMemberRemove", async (member) => {
@@ -18,7 +18,7 @@ const showServerStats = (bot) => {
 
   bot.on("presenceUpdate", async (oldMember, newMember) => {
     await wait(1000);
-    updateStats(newMember, bot);
+    updateOnlineStats(newMember, bot);
   });
 };
 
@@ -28,9 +28,6 @@ const updateStats = async (member, bot) => {
   );
   const botCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_BOT_COUNT_CHANNEL_ID
-  );
-  const onlineUsersCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
   );
   const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
@@ -44,11 +41,6 @@ const updateStats = async (member, bot) => {
     console.error(e);
   }
   const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
-  const onlineUsers =
-    bot.guilds?.cache
-      ?.get(process.env.DISCORD_GUILD_ID)
-      .members?.cache?.filter((m) => m.presence?.status === "online").size -
-    botCount;
 
   if (botCount && memberCountChannel) {
     memberCountChannel.setName(
@@ -61,6 +53,23 @@ const updateStats = async (member, bot) => {
   if (botCount && botCountChannel) {
     botCountChannel.setName(`🤖 | Bots: ${botCount}`);
   }
+
+  if (followerCount && twitterFollowerCountChannel) {
+    twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
+  }
+};
+
+const updateOnlineStats = async (member, bot) => {
+  const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
+  const onlineUsers =
+    bot.guilds?.cache
+      ?.get(process.env.DISCORD_GUILD_ID)
+      .members?.cache?.filter((m) => m.presence?.status === "online").size -
+    botCount;
+
+  const onlineUsersCountChannel = await bot?.channels?.cache?.get(
+    process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
+  );
   if (onlineUsers && onlineUsersCountChannel) {
     onlineUsersCountChannel.setName(
       `🟢 | Online: ${
@@ -70,9 +79,6 @@ const updateStats = async (member, bot) => {
         botCount
       }`
     );
-  }
-  if (followerCount && twitterFollowerCountChannel) {
-    twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
   }
 };
 
