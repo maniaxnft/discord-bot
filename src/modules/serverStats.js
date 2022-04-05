@@ -42,9 +42,10 @@ const updateStats = async (member, bot) => {
     console.error(e);
   }
   const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
-  const memberCount =
-    member.guild?.members?.cache?.filter((m) => !m.user.bot).size - botCount;
-  if (botCount && memberCountChannel) {
+  const memberCount = member.guild?.members?.cache?.filter(
+    (m) => !m.user.bot
+  ).size;
+  if (memberCount && memberCountChannel) {
     memberCountChannel.setName(`🌍 | Members: ${memberCount}`);
   }
 
@@ -58,12 +59,11 @@ const updateStats = async (member, bot) => {
 };
 
 const updateOnlineStats = async (member, bot) => {
-  const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
-  const onlineUsers =
-    bot.guilds?.cache
-      ?.get(process.env.DISCORD_GUILD_ID)
-      .members?.cache?.filter((m) => m.presence?.status === "online").size -
-    botCount;
+  const onlineUsers = bot.guilds?.cache
+    ?.get(process.env.DISCORD_GUILD_ID)
+    .members?.cache?.filter(
+      (m) => m.presence?.status === "online" && !m.user.bot
+    ).size;
 
   const onlineUsersCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
