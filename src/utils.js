@@ -6,7 +6,7 @@ const sendErrorToLogChannel = async (bot, message, e) => {
       process.env.DISCORD_BOT_INFO_CHANNEL_ID
     );
     if (channel) {
-      channel.send("Error on boot: ", e);
+      channel.send("Error on boot: ", e.message);
     }
   }
 };
