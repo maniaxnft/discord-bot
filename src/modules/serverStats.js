@@ -18,6 +18,7 @@ const showServerStats = (bot) => {
 
   bot.on("presenceUpdate", async (oldMember, newMember) => {
     await wait(1000);
+    console.log("presenceUpdate!");
     updateOnlineStats(newMember, bot);
   });
 };
@@ -41,13 +42,10 @@ const updateStats = async (member, bot) => {
     console.error(e);
   }
   const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
-
+  const memberCount =
+    member.guild?.members?.cache?.filter((m) => !m.user.bot).size - botCount;
   if (botCount && memberCountChannel) {
-    memberCountChannel.setName(
-      `🌍 | Members: ${
-        member.guild?.members?.cache?.filter((m) => !m.user.bot).size - botCount
-      }`
-    );
+    memberCountChannel.setName(`🌍 | Members: ${memberCount}`);
   }
 
   if (botCount && botCountChannel) {
@@ -71,14 +69,7 @@ const updateOnlineStats = async (member, bot) => {
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
   );
   if (onlineUsers && onlineUsersCountChannel) {
-    onlineUsersCountChannel.setName(
-      `🟢 | Online: ${
-        bot.guilds.cache
-          .get(process.env.DISCORD_GUILD_ID)
-          .members?.cache?.filter((m) => m.presence?.status === "online").size -
-        botCount
-      }`
-    );
+    onlineUsersCountChannel.setName(`🟢 | Online: ${onlineUsers}`);
   }
 };
 
