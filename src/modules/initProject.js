@@ -28,6 +28,7 @@ const checkEnvVars = () => {
     process.env.DISCORD_ADMIN_ROLE_ID,
     process.env.DISCORD_TWEETS_CHANNEL_ID,
     process.env.DISCORD_INVITE_TRACKER_CHANNEL_ID,
+    process.env.DISCORD_TRADES_CHANNEL_ID,
     process.env.COINGECKO_V3_API_URL,
     process.env.TWITTER_CONSUMER_KEY,
     process.env.TWITTER_CONSUMER_SECRET,
@@ -36,6 +37,12 @@ const checkEnvVars = () => {
     process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID,
     process.env.DISCORD_BOT_COUNT_CHANNEL_ID,
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID,
+    process.env.MORALIS_NFT_URL,
+    process.env.MORALIS_WEB3_API_KEY,
+    process.env.NFT_CONTRACT_ADDRESS,
+    process.env.NFT_CHAIN,
+    process.env.TRANSACTION_EXPLORER_URL,
+    process.env.COIN_NAME,
   ];
 
   if (envArray.includes(undefined)) {
