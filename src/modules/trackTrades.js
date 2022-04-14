@@ -16,7 +16,10 @@ const trackTrades = (bot) => {
           },
         }
       );
-      const transactions = res.data?.result;
+      const transactions = res.data?.result?.sort(
+        (a, b) =>
+          Date.parse(a?.block_timestamp) - Date.parse(b?.block_timestamp)
+      );
 
       for (let i = 0; i < transactions.length; i++) {
         try {
@@ -93,7 +96,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 10000);
+  }, 5000);
 };
 
 module.exports = trackTrades;
