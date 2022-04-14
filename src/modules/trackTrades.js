@@ -1,7 +1,12 @@
 /* eslint-disable multiline-ternary */
 const { default: axios } = require("axios");
 const { MessageEmbed } = require("discord.js");
-const { sendErrorToLogChannel, isValidHttpUrl, toValue } = require("../utils");
+const {
+  sendErrorToLogChannel,
+  isValidHttpUrl,
+  toValue,
+  wait,
+} = require("../utils");
 
 const trackTrades = (bot) => {
   const salesSentToDiscordChannel = [];
@@ -52,6 +57,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
+            await wait(500);
             tradeBefore = tradeBefore.data?.result
               ?.filter((trans) => Number(trans.value) > 0)
               .sort(
