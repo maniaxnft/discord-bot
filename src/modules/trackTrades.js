@@ -69,12 +69,13 @@ const trackTrades = (bot) => {
             ) {
               const messageEmbed = new MessageEmbed()
                 .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
-                .setTitle("Trade!")
+                .setTitle("Trade")
                 .setURL(transactionUrl)
-                .setDescription(
-                  `Traded for ${tradedValue} ${process.env.COIN_NAME}`
-                )
                 .addFields(
+                  {
+                    name: "Value",
+                    value: `${tradedValue} ${process.env.COIN_NAME}`,
+                  },
                   { name: "Buyer", value: buyer },
                   {
                     name: "Seller",
