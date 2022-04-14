@@ -49,6 +49,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
+            await wait(300);
             let tradeBefore = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal&limit=50`,
               {
@@ -57,14 +58,18 @@ const trackTrades = (bot) => {
                 },
               }
             );
-            await wait(500);
-            tradeBefore = tradeBefore.data?.result
-              ?.filter((trans) => Number(trans.value) > 0)
-              .sort(
-                (a, b) =>
-                  Date.parse(a?.block_timestamp) -
-                  Date.parse(b?.block_timestamp)
-              )[0];
+            if (
+              Array.isArray(tradeBefore?.data?.result) &&
+              tradeBefore?.data?.result.length > 1
+            ) {
+              tradeBefore = tradeBefore.data?.result
+                ?.filter((trans) => Number(trans.value) > 0)
+                .sort(
+                  (a, b) =>
+                    Date.parse(b?.block_timestamp) -
+                    Date.parse(a?.block_timestamp)
+                )[1];
+            }
 
             const meta = JSON.parse(metadata?.data?.metadata);
             const imageUrl = meta?.image;
@@ -168,7 +173,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 5000);
+  }, 8000);
 };
 
 module.exports = trackTrades;
