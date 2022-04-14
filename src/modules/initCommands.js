@@ -3,7 +3,7 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const axios = require("axios");
 const { getTop10Invites } = require("./trackInvites");
-const { wait } = require("../utils");
+const { wait, sendErrorToLogChannel } = require("../utils");
 
 const initCommands = async (bot) => {
   const clientId = process.env.DISCORD_CLIENT_ID;
@@ -33,15 +33,11 @@ const initCommands = async (bot) => {
     console.log("Successfully registered application commands.");
     listenCommands(bot);
   } catch (e) {
-    throw new Error(e);
+    sendErrorToLogChannel(e, "Error while registering commands");
   }
 };
 
 const listenCommands = (bot) => {
-  bot.once("ready", () => {
-    console.log("Command bot is ready to use!");
-  });
-
   bot.on("interactionCreate", async (interaction) => {
     if (!interaction.isCommand()) return;
     let isAdmin = interaction?.member?.roles?.cache?.map(

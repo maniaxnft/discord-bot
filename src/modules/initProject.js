@@ -43,6 +43,9 @@ const checkEnvVars = () => {
     process.env.NFT_CHAIN,
     process.env.TRANSACTION_EXPLORER_URL,
     process.env.COIN_NAME,
+    process.env.DISCORD_VERIFY_HUMANITY_CHANNEL_ID,
+    process.env.DISCORD_VERIFIED_ROLE_ID,
+    process.env.DISCORD_BOT_COLOR,
   ];
 
   if (envArray.includes(undefined)) {

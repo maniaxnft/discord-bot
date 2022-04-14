@@ -2,10 +2,6 @@ const { wait, sendErrorToLogChannel } = require("../utils");
 const needle = require("needle");
 
 const showServerStats = (bot) => {
-  bot.once("ready", () => {
-    console.log("Server stats bot is ready to use!");
-  });
-
   bot.on("guildMemberAdd", async (member) => {
     await wait(1000);
     updateStats(member, bot, "guildMemberAdd");
@@ -18,7 +14,6 @@ const showServerStats = (bot) => {
 
   bot.on("presenceUpdate", async (oldMember, newMember) => {
     await wait(1000);
-    console.log("presenceUpdate!");
     updateOnlineStats(newMember, bot);
   });
 };
@@ -36,7 +31,7 @@ const updateStats = async (member, bot) => {
 
   let followerCount = undefined;
   try {
-    followerCount = await getTwitterFollowerCount();
+    followerCount = await getTwitterFollowerCount(bot);
   } catch (e) {
     sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
     console.error(e);
@@ -73,19 +68,21 @@ const updateOnlineStats = async (member, bot) => {
   }
 };
 
-const getTwitterFollowerCount = async () => {
+const getTwitterFollowerCount = async (bot) => {
   try {
     const response = await needle(
       "get",
       `https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names=${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}`
     );
     if (response.statusCode !== 200) {
-      console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
-      throw new Error(response.body);
+      sendErrorToLogChannel(
+        bot,
+        `Error at getTwitterFollowerCount, ${response.statusMessage}`
+      );
     }
     return response?.body[0]?.followers_count;
   } catch (e) {
-    throw new Error(e);
+    sendErrorToLogChannel(bot, `Error at getTwitterFollowerCount`, e);
   }
 };
 

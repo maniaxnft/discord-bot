@@ -18,13 +18,12 @@ const listenTweets = async (bot) => {
   });
 
   try {
-    currentRules = await getAllRules();
-    await deleteAllRules(currentRules);
-    await setRules(currentRules);
+    currentRules = await getAllRules(bot);
+    await deleteAllRules(currentRules, bot);
+    await setRules(bot);
     streamConnect(bot, 0);
   } catch (e) {
     sendErrorToLogChannel(bot, "Error while listening tweets: ", e);
-    console.error(e);
   }
 };
 
@@ -42,17 +41,13 @@ const streamConnect = (bot, retryAttempt) => {
       try {
         const tweet = JSON.parse(data);
         await sendTweetToChannel(bot, tweet);
-        // A successful connection resets retry count.
         retryAttempt = 0;
       } catch (e) {
         if (
           data.detail ===
           "This stream is currently at the maximum allowed connection limit."
         ) {
-          console.log(data.detail);
           sendErrorToLogChannel(bot, data.detail, e);
-        } else {
-          // Keep alive signal received. Do nothing.
         }
       }
     })
@@ -79,26 +74,26 @@ const sendTweetToChannel = async (bot, tweet) => {
     const tweetURL = `https://twitter.com/${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}/status/${tweet?.data?.id}`;
     channel.send(`${tweetURL}`);
   } else {
-    console.log(
-      "Channel undefined OR tweet is in wrong format or undefined \n"
+    sendErrorToLogChannel(
+      bot,
+      "Channel undefined OR tweet is in wrong format or undefined"
     );
   }
 };
 
-const getAllRules = async () => {
+const getAllRules = async (bot) => {
   const response = await needle("get", rulesURL, {
     headers: {
       authorization: `Bearer ${token}`,
     },
   });
   if (response.statusCode !== 200) {
-    console.log("Error:", response.statusMessage, `${response.statusCode}\n`);
-    throw new Error(response.body);
+    sendErrorToLogChannel(bot, response.statusMessage);
   }
   return response.body;
 };
 
-const deleteAllRules = async (rules) => {
+const deleteAllRules = async (rules, bot) => {
   if (!Array.isArray(rules.data)) {
     return null;
   }
@@ -117,12 +112,12 @@ const deleteAllRules = async (rules) => {
   });
 
   if (response.statusCode !== 200) {
-    throw new Error(response.body);
+    sendErrorToLogChannel(bot, response.body);
   }
   return response.body;
 };
 
-const setRules = async () => {
+const setRules = async (bot) => {
   const data = {
     add: rules,
   };
@@ -134,7 +129,7 @@ const setRules = async () => {
   });
 
   if (response.statusCode !== 201) {
-    throw new Error(response.body);
+    sendErrorToLogChannel(bot, response.body);
   }
   return response.body;
 };

@@ -7,7 +7,7 @@ const trackTrades = (bot) => {
     try {
       const date = new Date();
       const res = await axios.get(
-        `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal&limit=30`,
+        `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal`,
         {
           headers: {
             "x-api-key": process.env.MORALIS_WEB3_API_KEY,

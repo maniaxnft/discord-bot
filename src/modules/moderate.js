@@ -1,10 +1,6 @@
 const { wait } = require("../utils");
 
 const moderate = (bot) => {
-  bot.on("ready", () => {
-    console.log("Moderator bot is ready to use!");
-  });
-
   bot.on("messageCreate", async (message) => {
     await wait(300);
     const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);

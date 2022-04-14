@@ -7,6 +7,7 @@ const listenTweets = require("./modules/listenTweets");
 const showServerStats = require("./modules/serverStats");
 const moderate = require("./modules/moderate");
 const trackTrades = require("./modules/trackTrades");
+const verifyYourself = require("./modules/verifyYourself");
 
 const { sendErrorToLogChannel } = require("./utils");
 
@@ -17,6 +18,7 @@ const boot = async () => {
     bot = await initBot();
     await initCommands(bot);
     await listenTweets(bot);
+    verifyYourself(bot);
     showServerStats(bot);
     moderate(bot);
     trackTrades(bot);
