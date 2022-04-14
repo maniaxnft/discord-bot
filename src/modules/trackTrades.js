@@ -117,7 +117,11 @@ const trackTrades = (bot) => {
                       value: `${lastTradeValue} ${process.env.COIN_NAME}`,
                       inline: true,
                     },
-                    { name: "Delta", value: delta, inline: true },
+                    {
+                      name: `${delta < 0 ? "Loss" : "Profit"}`,
+                      value: delta,
+                      inline: true,
+                    },
                     { name: "\u200B", value: "\u200B" },
                     { name: "Buyer", value: buyer, inline: true },
                     {
