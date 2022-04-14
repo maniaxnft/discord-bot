@@ -85,7 +85,7 @@ const trackTrades = (bot) => {
             if (!isNaN(lastTradeValue) && lastTradeValue > 0) {
               deltaValue = Number((tradedValue - lastTradeValue).toFixed(2));
               if (deltaValue < 0) {
-                delta = `${deltaValue} 📜✋`;
+                delta = `${Math.abs(deltaValue)} 📜✋`;
               } else {
                 delta = `${deltaValue} 🚀`;
               }
