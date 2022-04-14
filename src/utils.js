@@ -23,8 +23,13 @@ const isValidHttpUrl = (string) => {
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
+const toValue = (string) => {
+  return Number(string) / Math.pow(10, 18);
+};
+
 module.exports = {
   wait,
   sendErrorToLogChannel,
   isValidHttpUrl,
+  toValue,
 };
