@@ -81,12 +81,13 @@ const trackTrades = (bot) => {
             );
 
             let delta = "";
+            let deltaValue = "";
             if (!isNaN(lastTradeValue) && lastTradeValue > 0) {
-              delta = (tradedValue - lastTradeValue).toFixed(2);
-              if (delta < 0) {
-                delta = `${delta} 📜✋`;
+              deltaValue = Number((tradedValue - lastTradeValue).toFixed(2));
+              if (deltaValue < 0) {
+                delta = `${deltaValue} 📜✋`;
               } else {
-                delta = `${delta} 🚀`;
+                delta = `${deltaValue} 🚀`;
               }
             }
 
@@ -101,7 +102,9 @@ const trackTrades = (bot) => {
             ) {
               let messageEmbed = "";
 
-              if (tradeBefore && delta) {
+              if (tradeBefore && !isNaN(deltaValue)) {
+                const isProfit = Number(deltaValue) > 0;
+
                 messageEmbed = new MessageEmbed()
                   .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
                   .setTitle("Trade")
@@ -118,7 +121,7 @@ const trackTrades = (bot) => {
                       inline: true,
                     },
                     {
-                      name: `${delta < 0 ? "Loss" : "Profit"}`,
+                      name: `${isProfit ? "Profit" : "Loss"}`,
                       value: delta,
                       inline: true,
                     },
