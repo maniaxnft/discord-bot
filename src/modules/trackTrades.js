@@ -1,6 +1,7 @@
 /* eslint-disable multiline-ternary */
 const { default: axios } = require("axios");
 const { MessageEmbed } = require("discord.js");
+const { sendErrorToLogChannel } = require("../utils");
 
 const trackTrades = (bot) => {
   setInterval(async () => {
@@ -80,11 +81,14 @@ const trackTrades = (bot) => {
             }
           }
         } catch (e) {
-          console.log(e);
+          sendErrorToLogChannel(bot, `error at getting trades, ${e}`);
         }
       }
     } catch (e) {
-      console.log(e);
+      sendErrorToLogChannel(
+        bot,
+        `error at getting transactions of trades, ${e}`
+      );
     }
   }, 5000);
 };
