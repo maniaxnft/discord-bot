@@ -49,7 +49,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
-            await wait(5000);
+            await wait(500);
             let tradeBefore = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal&limit=50`,
               {
@@ -167,8 +167,8 @@ const trackTrades = (bot) => {
                   .setTimestamp(transactionTime);
               }
 
-              tradesChannel.send({ embeds: [messageEmbed] });
               salesSentToDiscordChannel.push(transHash);
+              tradesChannel.send({ embeds: [messageEmbed] });
             }
           }
         } catch (e) {
@@ -178,7 +178,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 10000);
+  }, 20000);
 };
 
 module.exports = trackTrades;
