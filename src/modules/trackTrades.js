@@ -110,6 +110,7 @@ const trackTrades = (bot) => {
               if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
 
+                await wait(300);
                 messageEmbed = new MessageEmbed()
                   .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
                   .setTitle("Trade")
