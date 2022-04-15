@@ -34,7 +34,6 @@ const trackTrades = (bot) => {
             res.data?.result[i]?.block_timestamp
           );
           const transHash = res.data?.result[i]?.transaction_hash;
-          salesSentToDiscordChannel.push(transHash);
           const transactionUrl = `${process.env.TRANSACTION_EXPLORER_URL}${transHash}`;
 
           if (
@@ -43,6 +42,7 @@ const trackTrades = (bot) => {
             !salesSentToDiscordChannel.includes(transHash)
           ) {
             await wait(100);
+            salesSentToDiscordChannel.push(transHash);
             const metadata = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}?chain=${process.env.NFT_CHAIN}&format=decimal`,
               {
