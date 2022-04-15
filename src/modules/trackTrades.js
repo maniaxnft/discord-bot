@@ -49,7 +49,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
-            await wait(2000);
+            await wait(5000);
             let tradeBefore = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal&limit=50`,
               {
@@ -106,11 +106,15 @@ const trackTrades = (bot) => {
               transactionTime
             ) {
               let messageEmbed = "";
+              const image = await axios({
+                method: "GET",
+                url: imageUrl,
+                responseType: "stream",
+              });
 
               if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
 
-                await wait(300);
                 messageEmbed = new MessageEmbed()
                   .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
                   .setTitle("Trade")
@@ -140,7 +144,7 @@ const trackTrades = (bot) => {
                     }
                   )
                   .addField("Rarity", rarity, true)
-                  .setImage(imageUrl)
+                  .setImage(image)
                   .setTimestamp(transactionTime);
               } else {
                 messageEmbed = new MessageEmbed()
@@ -159,7 +163,7 @@ const trackTrades = (bot) => {
                     }
                   )
                   .addField("Rarity", rarity, true)
-                  .setImage(imageUrl)
+                  .setImage(image)
                   .setTimestamp(transactionTime);
               }
 
