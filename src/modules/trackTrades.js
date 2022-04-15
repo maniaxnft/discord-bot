@@ -58,6 +58,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
+            console.log(tradeBefore);
             if (
               Array.isArray(tradeBefore?.data?.result) &&
               tradeBefore?.data?.result.length > 1
@@ -106,11 +107,6 @@ const trackTrades = (bot) => {
               transactionTime
             ) {
               let messageEmbed = "";
-              const image = await axios({
-                method: "GET",
-                url: imageUrl,
-                responseType: "stream",
-              });
 
               if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
@@ -144,7 +140,7 @@ const trackTrades = (bot) => {
                     }
                   )
                   .addField("Rarity", rarity, true)
-                  .setImage(image)
+                  .setImage(imageUrl)
                   .setTimestamp(transactionTime);
               } else {
                 messageEmbed = new MessageEmbed()
@@ -163,11 +159,12 @@ const trackTrades = (bot) => {
                     }
                   )
                   .addField("Rarity", rarity, true)
-                  .setImage(image)
+                  .setImage(imageUrl)
                   .setTimestamp(transactionTime);
               }
 
               salesSentToDiscordChannel.push(transHash);
+              await wait(100);
               tradesChannel.send({ embeds: [messageEmbed] });
             }
           }
@@ -178,7 +175,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 20000);
+  }, 5000);
 };
 
 module.exports = trackTrades;
