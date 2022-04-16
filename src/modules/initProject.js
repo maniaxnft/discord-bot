@@ -30,8 +30,6 @@ const checkEnvVars = () => {
     process.env.DISCORD_INVITE_TRACKER_CHANNEL_ID,
     process.env.DISCORD_TRADES_CHANNEL_ID,
     process.env.COINGECKO_V3_API_URL,
-    process.env.TWITTER_CONSUMER_KEY,
-    process.env.TWITTER_CONSUMER_SECRET,
     process.env.TWITTER_BEARER_TOKEN,
     process.env.TWITTER_OFFICIAL_CHANNEL_NAME,
     process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID,

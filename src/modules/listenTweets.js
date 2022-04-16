@@ -13,9 +13,6 @@ const rules = [
 
 const listenTweets = async (bot) => {
   let currentRules;
-  bot.once("ready", () => {
-    console.log("Twitter bot is ready to use!");
-  });
 
   try {
     currentRules = await getAllRules(bot);
@@ -23,7 +20,7 @@ const listenTweets = async (bot) => {
     await setRules(bot);
     streamConnect(bot, 0);
   } catch (e) {
-    sendErrorToLogChannel(bot, "Error while listening tweets: ", e);
+    sendErrorToLogChannel(bot, "Error while listening tweets ", e);
   }
 };
 
@@ -70,13 +67,14 @@ const sendTweetToChannel = async (bot, tweet) => {
     process.env.DISCORD_TWEETS_CHANNEL_ID
   );
   const tweetText = tweet?.data?.text;
-  if (channel && tweetText && tweet?.data?.id) {
-    const tweetURL = `https://twitter.com/${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}/status/${tweet?.data?.id}`;
+  const tweetDataId = tweet?.data?.id;
+  if (channel && tweetText && tweetDataId) {
+    const tweetURL = `https://twitter.com/${process.env.TWITTER_OFFICIAL_CHANNEL_NAME}/status/${tweetDataId}`;
     channel.send(`${tweetURL}`);
   } else {
     sendErrorToLogChannel(
       bot,
-      "Channel undefined OR tweet is in wrong format or undefined"
+      "Channel undefined OR tweetText undefined or tweetDataId undefined"
     );
   }
 };
@@ -88,7 +86,7 @@ const getAllRules = async (bot) => {
     },
   });
   if (response.statusCode !== 200) {
-    sendErrorToLogChannel(bot, response.statusMessage);
+    sendErrorToLogChannel(bot, `Error deleteAllRules: ${response.body}`);
   }
   return response.body;
 };
@@ -112,7 +110,7 @@ const deleteAllRules = async (rules, bot) => {
   });
 
   if (response.statusCode !== 200) {
-    sendErrorToLogChannel(bot, response.body);
+    sendErrorToLogChannel(bot, `Error deleteAllRules: ${response.body}`);
   }
   return response.body;
 };
@@ -129,7 +127,7 @@ const setRules = async (bot) => {
   });
 
   if (response.statusCode !== 201) {
-    sendErrorToLogChannel(bot, response.body);
+    sendErrorToLogChannel(bot, `Error setRules: ${response.body}`);
   }
   return response.body;
 };
