@@ -8,7 +8,7 @@ const updateRemainingWhitelist = (bot) => {
       let remainigModel = await remainingWhitelistModel.findOne();
       if (!remainigModel) {
         await remainingWhitelistModel.create({ count: 0 });
-        remainigModel = remainingWhitelistModel.findOne();
+        remainigModel = await remainingWhitelistModel.findOne();
       }
       let count = remainigModel.count;
       if (message.channelId === process.env.DISCORD_GOLD_CHANNEL_ID) {
