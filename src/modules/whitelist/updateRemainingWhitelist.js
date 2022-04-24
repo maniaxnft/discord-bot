@@ -20,7 +20,10 @@ const updateRemainingWhitelist = (bot) => {
       if (message.channelId === process.env.DISCORD_BRONZ_CHANNEL_ID) {
         count = count + 6;
       }
-      await remainingWhitelistModel.findOneAndUpdate({ count });
+      await remainingWhitelistModel.findByIdAndUpdate(
+        remainigModel._id.toString(),
+        { count }
+      );
     } catch (e) {
       sendErrorToLogChannel(
         bot,

@@ -4,7 +4,7 @@ const remainingWhitelistSchema = mongoose.Schema({
   count: Number,
 });
 const remainingWhitelistModel = mongoose.model(
-  "remainingWhitelistModel",
+  "remaining-whitelist",
   remainingWhitelistSchema
 );
 
