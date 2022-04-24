@@ -38,9 +38,9 @@ const verifyYourself = async (bot) => {
         reaction.emoji?.name === verifyEmoji
       ) {
         try {
-          await reaction.message?.guild?.members?.cache
-            ?.get(user.id)
-            ?.roles?.add(verifiedRole);
+          await reaction.message.guild.members.cache
+            .get(user.id)
+            .roles.add(verifiedRole);
         } catch (e) {
           sendErrorToLogChannel(
             bot,

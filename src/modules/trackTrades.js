@@ -93,6 +93,8 @@ const trackTrades = (bot) => {
               deltaValue = Number((tradedValue - lastTradeValue).toFixed(2));
               if (deltaValue < 0) {
                 delta = `${Math.abs(deltaValue)} ${process.env.COIN_NAME} .. `;
+              } else if (deltaValue === 0) {
+                delta = ``;
               } else {
                 delta = `${deltaValue} ${process.env.COIN_NAME} 🚀`;
               }
@@ -111,6 +113,15 @@ const trackTrades = (bot) => {
 
               if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
+                const isNeutral = Number(deltaValue) === 0;
+                let revenue = "";
+                if (isProfit) {
+                  revenue = "Profit";
+                } else if (!isProfit && isNeutral) {
+                  revenue = "No Revenue";
+                } else {
+                  revenue = "Loss";
+                }
 
                 messageEmbed = new MessageEmbed()
                   .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
@@ -128,7 +139,7 @@ const trackTrades = (bot) => {
                       inline: true,
                     },
                     {
-                      name: `${isProfit ? "Profit" : "Loss"}`,
+                      name: revenue,
                       value: delta,
                       inline: true,
                     },
