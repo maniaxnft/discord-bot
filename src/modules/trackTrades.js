@@ -7,6 +7,9 @@ const {
   toValue,
   wait,
 } = require("../utils");
+const Fs = require("fs");
+const Path = require("path");
+const isCorrupted = require("is-corrupted-jpeg");
 
 const trackTrades = (bot) => {
   const salesSentToDiscordChannel = [];
@@ -110,8 +113,15 @@ const trackTrades = (bot) => {
               transactionTime
             ) {
               let messageEmbed = "";
+              await downloadImage(imageUrl, tokenId);
+              const path = Path.resolve(
+                __dirname,
+                "nft-images",
+                `${tokenId}.jpg`
+              );
+              const isImageCorrupted = isCorrupted(path);
 
-              if (tradeBefore && !isNaN(deltaValue)) {
+              if (tradeBefore && !isNaN(deltaValue) && !isImageCorrupted) {
                 const isProfit = Number(deltaValue) > 0;
                 const isNeutral = Number(deltaValue) === 0;
                 let revenue = "";
@@ -186,5 +196,23 @@ const trackTrades = (bot) => {
     }
   }, 10000);
 };
+
+async function downloadImage(url, tokenId) {
+  const path = Path.resolve(__dirname, "nft-images", `${tokenId}.jpg`);
+  const writer = Fs.createWriteStream(path);
+
+  const response = await axios({
+    url,
+    method: "GET",
+    responseType: "stream",
+  });
+
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
+  });
+}
 
 module.exports = trackTrades;
