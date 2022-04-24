@@ -154,7 +154,6 @@ const trackTrades = (bot) => {
                   .addField("Rarity", rarity, true)
                   .setImage(imageUrl)
                   .setTimestamp(transactionTime);
-                sendErrorToLogChannel(bot, `trade image url: ${imageUrl}`);
               } else {
                 messageEmbed = new MessageEmbed()
                   .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
