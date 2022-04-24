@@ -1,26 +1,26 @@
-// const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
-const init = () => {
+const init = async () => {
   try {
     checkEnvVars();
-    // await connectToMongo();
+    await connectToMongo();
   } catch (e) {
     throw new Error(e);
   }
 };
 
-/*const connectToMongo = async () => {
+const connectToMongo = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Successfully connected to mongodb!");
   } catch (e) {
     throw new Error(e);
   }
-};*/
+};
 
 const checkEnvVars = () => {
   const envArray = [
-    // process.env.MONGO_URL,
+    process.env.MONGO_URL,
     process.env.DISCORD_TOKEN,
     process.env.DISCORD_CLIENT_ID,
     process.env.DISCORD_GUILD_ID,
