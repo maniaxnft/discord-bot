@@ -120,9 +120,6 @@ const trackTrades = (bot) => {
                 `${tokenId}.jpg`
               );
               const isImageCorrupted = isCorrupted(path);
-              console.log(`isImageCorrupted: ${isImageCorrupted}`);
-              console.log(`path: ${path}`);
-              console.log(``);
 
               if (tradeBefore && !isNaN(deltaValue) && !isImageCorrupted) {
                 const isProfit = Number(deltaValue) > 0;
