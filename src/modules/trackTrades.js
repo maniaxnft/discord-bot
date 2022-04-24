@@ -94,7 +94,7 @@ const trackTrades = (bot) => {
               if (deltaValue < 0) {
                 delta = `${Math.abs(deltaValue)} ${process.env.COIN_NAME} .. `;
               } else if (deltaValue === 0) {
-                delta = ``;
+                delta = `0`;
               } else {
                 delta = `${deltaValue} ${process.env.COIN_NAME} 🚀`;
               }
