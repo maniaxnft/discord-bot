@@ -48,6 +48,7 @@ const checkEnvVars = () => {
     process.env.DISCORD_SILVER_CHANNEL_ID,
     process.env.DISCORD_BRONZ_CHANNEL_ID,
     process.env.DISCORD_WHITELIST_INFO_CHANNEL_ID,
+    process.env.DISCORD_VERIFY_HUMANITY_MESSAGE_ID,
   ];
   if (envArray.includes(undefined)) {
     console.error("Some of the env var(s) is(are) missing");

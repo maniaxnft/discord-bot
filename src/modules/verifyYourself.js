@@ -50,6 +50,24 @@ const verifyYourself = async (bot) => {
         }
       }
     });
+
+    bot.on("guildMemberRemove", async (member) => {
+      await wait(300);
+      try {
+        const message = bot.channels.cache
+          .get(process.env.DISCORD_VERIFY_HUMANITY_CHANNEL_ID)
+          .messages.fetch(process.env.DISCORD_VERIFY_HUMANITY_MESSAGE_ID);
+        message?.reactions.cache.filter((reaction) =>
+          reaction.users.remove(member.user.id)
+        );
+      } catch (e) {
+        sendErrorToLogChannel(
+          bot,
+          `Error while removing verify reaction after ${member.user.id} left the server`,
+          e
+        );
+      }
+    });
   } catch (e) {
     sendErrorToLogChannel(bot, "verifyYourself error", e);
   }
