@@ -1,5 +1,4 @@
 const { sendErrorToLogChannel } = require("../../utils");
-const cronJob = require("./cronJob");
 const { remainingWhitelistModel } = require("./models");
 
 const updateRemainingWhitelist = (bot) => {
@@ -55,7 +54,6 @@ const updateRemainingWhitelist = (bot) => {
       );
     }
   };
-  cronJob(bot);
 };
 
 module.exports = updateRemainingWhitelist;
