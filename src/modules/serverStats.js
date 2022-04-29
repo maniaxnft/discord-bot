@@ -1,59 +1,54 @@
-const { wait, sendErrorToLogChannel } = require("../utils");
 const needle = require("needle");
+const cron = require("node-cron");
+
+const { sendErrorToLogChannel } = require("../utils");
 
 const showServerStats = (bot) => {
-  bot.on("guildMemberAdd", async (member) => {
-    await wait(1000);
-    updateStats(member, bot, "guildMemberAdd");
+  //run every .. mins
+  cron.schedule("*/30 * * * *", () => {
+    updateMemberCount(bot);
   });
-
-  bot.on("guildMemberRemove", async (member) => {
-    await wait(1000);
-    updateStats(member, bot);
+  cron.schedule("*/60 * * * *", () => {
+    updateOnlineCount(bot);
   });
-
-  bot.on("presenceUpdate", async (oldMember, newMember) => {
-    await wait(1000);
-    updateOnlineStats(newMember, bot);
+  cron.schedule("*/90 * * * *", () => {
+    updateTwitterCount(bot);
   });
 };
 
-const updateStats = async (member, bot) => {
+const updateMemberCount = async (bot) => {
+  const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
+
   const memberCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID
   );
   const botCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_BOT_COUNT_CHANNEL_ID
   );
-  const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
-  );
 
-  let followerCount = undefined;
-  try {
-    followerCount = await getTwitterFollowerCount(bot);
-  } catch (e) {
-    sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
-    console.error(e);
-  }
-  const botCount = member.guild?.members?.cache?.filter((m) => m.user.bot).size;
-  const memberCount = member.guild?.members?.cache?.filter(
-    (m) => !m.user.bot
-  ).size;
-  if (memberCount && memberCountChannel) {
-    memberCountChannel.setName(`🌍 | Members: ${memberCount}`);
+  const botCount = guild?.members?.cache?.filter((m) => m.user.bot).size;
+  const memberCount = guild?.members?.cache?.filter((m) => !m.user.bot).size;
+
+  const memberCountChannelName = `🌍 | Members: ${memberCount}`;
+  const botCountChannelName = `🤖 | Bots: ${botCount}`;
+  if (
+    memberCount &&
+    memberCountChannel &&
+    memberCountChannel.name !== memberCountChannelName
+  ) {
+    memberCountChannel.setName(memberCountChannelName);
   }
 
-  if (botCount && botCountChannel) {
-    botCountChannel.setName(`🤖 | Bots: ${botCount}`);
-  }
-
-  if (followerCount && twitterFollowerCountChannel) {
-    twitterFollowerCountChannel.setName(`🗝︱ Twitter: ${followerCount}`);
+  if (
+    botCount &&
+    botCountChannel &&
+    botCountChannel.name !== botCountChannelName
+  ) {
+    botCountChannel.setName(botCountChannelName);
   }
 };
 
-const updateOnlineStats = async (member, bot) => {
+const updateOnlineCount = async (bot) => {
   const onlineUsers = bot.guilds?.cache
     ?.get(process.env.DISCORD_GUILD_ID)
     .members?.cache?.filter(
@@ -63,8 +58,34 @@ const updateOnlineStats = async (member, bot) => {
   const onlineUsersCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
   );
-  if (onlineUsers && onlineUsersCountChannel) {
-    onlineUsersCountChannel.setName(`🟢 | Online: ${onlineUsers}`);
+  const onlineUsersCountChannelName = `🟢 | Online: ${onlineUsers}`;
+  if (
+    onlineUsers &&
+    onlineUsersCountChannel &&
+    onlineUsersCountChannel.name !== onlineUsersCountChannelName
+  ) {
+    onlineUsersCountChannel.setName(onlineUsersCountChannelName);
+  }
+};
+
+const updateTwitterCount = async (bot) => {
+  let followerCount = undefined;
+  const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
+    process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
+  );
+  const twitterFollowerCountChannelName = `🐦︱ Twitter: ${followerCount}`;
+  try {
+    followerCount = await getTwitterFollowerCount(bot);
+    if (
+      followerCount &&
+      twitterFollowerCountChannel &&
+      twitterFollowerCountChannel.name !== twitterFollowerCountChannelName
+    ) {
+      twitterFollowerCountChannel.setName(twitterFollowerCountChannelName);
+    }
+  } catch (e) {
+    sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
+    console.error(e);
   }
 };
 
