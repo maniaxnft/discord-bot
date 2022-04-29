@@ -16,11 +16,6 @@ const cronJob = (bot) => {
         whitelistCountChannel.name !== whitelistCountChannelName
       ) {
         whitelistCountChannel.setName(whitelistCountChannelName);
-      } else {
-        sendErrorToLogChannel(
-          bot,
-          "remainingWhitelistModel or whitelistCountChannel is undefined"
-        );
       }
     } catch (e) {
       sendErrorToLogChannel(bot, "Error on cron job", e);
