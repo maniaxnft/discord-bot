@@ -1,19 +1,53 @@
 const needle = require("needle");
-const cron = require("node-cron");
 
-const { sendErrorToLogChannel } = require("../utils");
+const { sendErrorToLogChannel, wait } = require("../utils");
+const { remainingWhitelistModel } = require("./whitelist/models");
 
-const showServerStats = (bot) => {
-  //run every .. mins
-  cron.schedule("*/30 * * * *", () => {
-    updateMemberCount(bot);
-  });
-  cron.schedule("*/60 * * * *", () => {
-    updateOnlineCount(bot);
-  });
-  cron.schedule("*/90 * * * *", () => {
-    updateTwitterCount(bot);
-  });
+const updateServerStats = async (bot) => {
+  while (true) {
+    await updateWhitelistCount(bot);
+    await updateMemberCount(bot);
+    // https://stackoverflow.com/questions/62791271/discord-js-cant-change-channel-name-more-than-twice/62792412#62792412
+    await wait(600000);
+    await updateBotCount(bot);
+    await updateOnlineCount(bot);
+    await wait(600001);
+    await updateTwitterCount(bot);
+    await wait(600001);
+  }
+};
+
+const updateWhitelistCount = async (bot) => {
+  try {
+    const whitelistCountChannel = await bot?.channels?.cache?.get(
+      process.env.DISCORD_WHITELIST_INFO_CHANNEL_ID
+    );
+    const remaining = await remainingWhitelistModel.findOne();
+    const whitelistCountChannelName = `Whitelist: ${remaining.count} / 1300`;
+    if (remaining && whitelistCountChannel.name !== whitelistCountChannelName) {
+      whitelistCountChannel.setName(whitelistCountChannelName);
+    }
+  } catch (e) {
+    sendErrorToLogChannel(bot, "Error on cron job", e);
+  }
+};
+
+const updateBotCount = async (bot) => {
+  const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
+
+  const botCountChannel = await bot?.channels?.cache?.get(
+    process.env.DISCORD_BOT_COUNT_CHANNEL_ID
+  );
+  const botCount = guild?.members?.cache?.filter((m) => m.user.bot).size;
+  const botCountChannelName = `🤖 | Bots: ${botCount}`;
+
+  if (
+    botCount &&
+    botCountChannel &&
+    botCountChannel.name !== botCountChannelName
+  ) {
+    botCountChannel.setName(botCountChannelName);
+  }
 };
 
 const updateMemberCount = async (bot) => {
@@ -22,29 +56,16 @@ const updateMemberCount = async (bot) => {
   const memberCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID
   );
-  const botCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_BOT_COUNT_CHANNEL_ID
-  );
 
-  const botCount = guild?.members?.cache?.filter((m) => m.user.bot).size;
   const memberCount = guild?.members?.cache?.filter((m) => !m.user.bot).size;
 
   const memberCountChannelName = `🌍 | Members: ${memberCount}`;
-  const botCountChannelName = `🤖 | Bots: ${botCount}`;
   if (
     memberCount &&
     memberCountChannel &&
     memberCountChannel.name !== memberCountChannelName
   ) {
     memberCountChannel.setName(memberCountChannelName);
-  }
-
-  if (
-    botCount &&
-    botCountChannel &&
-    botCountChannel.name !== botCountChannelName
-  ) {
-    botCountChannel.setName(botCountChannelName);
   }
 };
 
@@ -107,4 +128,4 @@ const getTwitterFollowerCount = async (bot) => {
   }
 };
 
-module.exports = showServerStats;
+module.exports = updateServerStats;
