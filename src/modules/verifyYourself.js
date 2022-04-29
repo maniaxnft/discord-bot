@@ -54,9 +54,10 @@ const verifyYourself = async (bot) => {
     bot.on("guildMemberRemove", async (member) => {
       await wait(300);
       try {
-        const message = bot.channels.cache
+        const message = await bot.channels.cache
           .get(process.env.DISCORD_VERIFY_HUMANITY_CHANNEL_ID)
           .messages.fetch(process.env.DISCORD_VERIFY_HUMANITY_MESSAGE_ID);
+
         message?.reactions.cache.filter((reaction) =>
           reaction.users.remove(member.user.id)
         );
