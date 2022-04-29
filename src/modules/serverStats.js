@@ -94,9 +94,9 @@ const updateTwitterCount = async (bot) => {
   const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
     process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
   );
-  const twitterFollowerCountChannelName = `🐦︱ Twitter: ${followerCount}`;
   try {
     followerCount = await getTwitterFollowerCount(bot);
+    const twitterFollowerCountChannelName = `🐦︱ Twitter: ${followerCount}`;
     if (
       followerCount &&
       twitterFollowerCountChannel &&
