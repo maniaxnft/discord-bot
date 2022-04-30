@@ -4,10 +4,12 @@ const { sendErrorToLogChannel, wait } = require("../utils");
 const { remainingWhitelistModel } = require("./whitelist/models");
 
 const updateServerStats = async (bot) => {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
+    // https://stackoverflow.com/a/62792412/3756237
+    await wait(600001);
     await updateWhitelistCount(bot);
     await updateMemberCount(bot);
-    // https://stackoverflow.com/questions/62791271/discord-js-cant-change-channel-name-more-than-twice/62792412#62792412
     await wait(600001);
     await updateBotCount(bot);
     await updateOnlineCount(bot);
