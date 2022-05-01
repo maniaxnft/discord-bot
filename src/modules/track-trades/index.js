@@ -1,19 +1,10 @@
 /* eslint-disable multiline-ternary */
 const { default: axios } = require("axios");
 const { MessageEmbed } = require("discord.js");
-const {
-  sendErrorToLogChannel,
-  isValidHttpUrl,
-  toValue,
-  wait,
-} = require("../utils");
-const Fs = require("fs");
-const Path = require("path");
-const isCorrupted = require("is-corrupted-jpeg");
+const { sendErrorToLogChannel, toValue, wait } = require("../../utils");
+const { trackedSalesModel } = require("./models");
 
 const trackTrades = (bot) => {
-  const salesSentToDiscordChannel = [];
-
   setInterval(async () => {
     try {
       const res = await axios.get(
@@ -36,16 +27,15 @@ const trackTrades = (bot) => {
           const transactionTime = new Date(
             res.data?.result[i]?.block_timestamp
           );
-          const transHash = res.data?.result[i]?.transaction_hash;
-          const transactionUrl = `${process.env.TRANSACTION_EXPLORER_URL}${transHash}`;
+          const transactionHash = res.data?.result[i]?.transaction_hash;
+          const transactionUrl = `${process.env.TRANSACTION_EXPLORER_URL}${transactionHash}`;
+          const saleDoesNotTrackedBefore =
+            trackedSalesModel.findOne({
+              transactionHash,
+            }) !== null;
 
-          if (
-            tokenId &&
-            value > 0 &&
-            !salesSentToDiscordChannel.includes(transHash)
-          ) {
+          if (tokenId && value > 0 && saleDoesNotTrackedBefore) {
             await wait(100);
-            salesSentToDiscordChannel.push(transHash);
             const metadata = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}?chain=${process.env.NFT_CHAIN}&format=decimal`,
               {
@@ -54,7 +44,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
-            await wait(500);
+            await wait(1000);
             let tradeBefore = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}/transfers?chain=${process.env.NFT_CHAIN}&format=decimal&limit=100`,
               {
@@ -106,22 +96,13 @@ const trackTrades = (bot) => {
             if (
               tradesChannel &&
               tradedValue > 0 &&
-              isValidHttpUrl(imageUrl) &&
               rarity &&
               buyer &&
               seller &&
               transactionTime
             ) {
               let messageEmbed = "";
-              await downloadImage(imageUrl, tokenId);
-              const path = Path.resolve(
-                __dirname,
-                "nft-images",
-                `${tokenId}.jpg`
-              );
-              const isImageCorrupted = isCorrupted(path);
-
-              if (tradeBefore && !isNaN(deltaValue) && !isImageCorrupted) {
+              if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
                 const isNeutral = Number(deltaValue) === 0;
                 let revenue = "";
@@ -185,6 +166,7 @@ const trackTrades = (bot) => {
                   .setTimestamp(transactionTime);
               }
               tradesChannel.send({ embeds: [messageEmbed] });
+              await trackedSalesModel.create({ transactionHash });
             }
           }
         } catch (e) {
@@ -194,25 +176,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 10000);
+  }, 20000);
 };
-
-async function downloadImage(url, tokenId) {
-  const path = Path.resolve(__dirname, "nft-images", `${tokenId}.jpg`);
-  const writer = Fs.createWriteStream(path);
-
-  const response = await axios({
-    url,
-    method: "GET",
-    responseType: "stream",
-  });
-
-  response.data.pipe(writer);
-
-  return new Promise((resolve, reject) => {
-    writer.on("finish", resolve);
-    writer.on("error", reject);
-  });
-}
 
 module.exports = trackTrades;
