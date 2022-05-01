@@ -32,7 +32,7 @@ const trackTrades = (bot) => {
           const saleDoesNotTrackedBefore =
             trackedSalesModel.findOne({
               transactionHash,
-            }) !== null;
+            }) === null;
 
           if (tokenId && value > 0 && saleDoesNotTrackedBefore) {
             await wait(100);
