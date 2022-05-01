@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const trackedSalesSchema = mongoose.Schema({
-  transactionHash: Number,
+  transactionHash: String,
 });
 const trackedSalesModel = mongoose.model("tracked-sales", trackedSalesSchema);
 

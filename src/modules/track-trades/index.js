@@ -101,6 +101,7 @@ const trackTrades = (bot) => {
               seller &&
               transactionTime
             ) {
+              trackedSalesModel.create({ transactionHash });
               let messageEmbed = "";
               if (tradeBefore && !isNaN(deltaValue)) {
                 const isProfit = Number(deltaValue) > 0;
@@ -166,7 +167,6 @@ const trackTrades = (bot) => {
                   .setTimestamp(transactionTime);
               }
               tradesChannel.send({ embeds: [messageEmbed] });
-              await trackedSalesModel.create({ transactionHash });
             }
           }
         } catch (e) {
