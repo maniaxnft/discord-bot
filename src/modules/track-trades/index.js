@@ -29,12 +29,11 @@ const trackTrades = (bot) => {
           );
           const transactionHash = res.data?.result[i]?.transaction_hash;
           const transactionUrl = `${process.env.TRANSACTION_EXPLORER_URL}${transactionHash}`;
-          const saleDoesNotTrackedBefore =
-            trackedSalesModel.findOne({
-              transactionHash,
-            }) === null;
+          const saleTrackedBefore = trackedSalesModel.findOne({
+            transactionHash,
+          });
 
-          if (tokenId && value > 0 && saleDoesNotTrackedBefore) {
+          if (tokenId && value > 0 && !saleTrackedBefore) {
             await wait(100);
             const metadata = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}?chain=${process.env.NFT_CHAIN}&format=decimal`,
