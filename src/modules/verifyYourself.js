@@ -20,7 +20,7 @@ const verifyYourself = async (bot) => {
       const messageEmbed = new MessageEmbed()
         .setColor(`#${process.env.DISCORD_BOT_COLOR}`)
         .setDescription(
-          `Welcome to the ${guild?.name}! React with ${verifyEmoji} to take the Verified Role`
+          `Welcome to the **${guild?.name}**! React with ${verifyEmoji} to take the Verified Role`
         );
       const veridyMessage = await channel.send({ embeds: [messageEmbed] });
       veridyMessage.react(verifyEmoji);
