@@ -29,7 +29,7 @@ const trackTrades = (bot) => {
           );
           const transactionHash = res.data?.result[i]?.transaction_hash;
           const transactionUrl = `${process.env.TRANSACTION_EXPLORER_URL}${transactionHash}`;
-          const saleTrackedBefore = trackedSalesModel.findOne({
+          const saleTrackedBefore = await trackedSalesModel.findOne({
             transactionHash,
           });
 
