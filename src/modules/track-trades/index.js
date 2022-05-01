@@ -100,11 +100,12 @@ const trackTrades = (bot) => {
               seller &&
               transactionTime
             ) {
-              trackedSalesModel.create({ transactionHash });
               let messageEmbed = "";
               if (tradeBefore && !isNaN(deltaValue)) {
+                trackedSalesModel.create({ transactionHash });
                 const isProfit = Number(deltaValue) > 0;
                 const isNeutral = Number(deltaValue) === 0;
+
                 let revenue = "";
                 if (isProfit) {
                   revenue = "Profit";
