@@ -1,12 +1,12 @@
 require("dotenv").config();
 
-// const custom = require("./modules/custom");
+const custom = require("./modules/custom");
 const initProject = require("./modules/initProject");
 const initBot = require("./modules/initBot");
 const initCommands = require("./modules/initCommands");
 const listenTweets = require("./modules/listenTweets");
 const updateServerStats = require("./modules/serverStats");
-const trackTrades = require("./modules/trackTrades");
+const trackTrades = require("./modules/track-trades");
 const verifyYourself = require("./modules/verifyYourself");
 const updateRemainingWhitelist = require("./modules/whitelist");
 
@@ -17,7 +17,7 @@ const boot = async () => {
   try {
     await initProject();
     bot = await initBot();
-    // custom(bot);
+    custom(bot);
     await initCommands(bot);
     await listenTweets(bot);
     verifyYourself(bot);
