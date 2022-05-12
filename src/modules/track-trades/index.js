@@ -15,6 +15,7 @@ const trackTrades = (bot) => {
           },
         }
       );
+      await wait(1000);
       const transactions = res.data?.result?.sort(
         (a, b) =>
           Date.parse(a?.block_timestamp) - Date.parse(b?.block_timestamp)
@@ -34,7 +35,6 @@ const trackTrades = (bot) => {
           });
 
           if (tokenId && value > 0 && !saleTrackedBefore) {
-            await wait(100);
             const metadata = await axios.get(
               `${process.env.MORALIS_NFT_URL}/${process.env.NFT_CONTRACT_ADDRESS}/${tokenId}?chain=${process.env.NFT_CHAIN}&format=decimal`,
               {
@@ -52,6 +52,7 @@ const trackTrades = (bot) => {
                 },
               }
             );
+            await wait(1000);
             if (
               Array.isArray(tradeBefore?.data?.result) &&
               tradeBefore?.data?.result.length > 1
@@ -176,7 +177,7 @@ const trackTrades = (bot) => {
     } catch (e) {
       sendErrorToLogChannel(bot, `error at getting transactions of trades`, e);
     }
-  }, 20000);
+  }, 50000);
 };
 
 module.exports = trackTrades;
