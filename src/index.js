@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv-safe").config();
 
 // const custom = require("./modules/custom");
 const initProject = require("./modules/initProject");

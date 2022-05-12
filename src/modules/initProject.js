@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const init = async () => {
   try {
-    checkEnvVars();
     await connectToMongo();
   } catch (e) {
     throw new Error(e);
@@ -15,44 +14,6 @@ const connectToMongo = async () => {
     console.log("Successfully connected to mongodb!");
   } catch (e) {
     throw new Error(e);
-  }
-};
-
-const checkEnvVars = () => {
-  const envArray = [
-    process.env.MONGO_URL,
-    process.env.DISCORD_TOKEN,
-    process.env.DISCORD_CLIENT_ID,
-    process.env.DISCORD_GUILD_ID,
-    process.env.DISCORD_ADMIN_ROLE_NAME,
-    process.env.DISCORD_ADMIN_ROLE_ID,
-    process.env.DISCORD_TWEETS_CHANNEL_ID,
-    process.env.DISCORD_INVITE_TRACKER_CHANNEL_ID,
-    process.env.DISCORD_TRADES_CHANNEL_ID,
-    process.env.COINGECKO_V3_API_URL,
-    process.env.TWITTER_BEARER_TOKEN,
-    process.env.TWITTER_OFFICIAL_CHANNEL_NAME,
-    process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID,
-    process.env.DISCORD_BOT_COUNT_CHANNEL_ID,
-    process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID,
-    process.env.MORALIS_NFT_URL,
-    process.env.MORALIS_WEB3_API_KEY,
-    process.env.NFT_CONTRACT_ADDRESS,
-    process.env.NFT_CHAIN,
-    process.env.TRANSACTION_EXPLORER_URL,
-    process.env.COIN_NAME,
-    process.env.DISCORD_VERIFY_HUMANITY_CHANNEL_ID,
-    process.env.DISCORD_VERIFIED_ROLE_ID,
-    process.env.DISCORD_BOT_COLOR,
-    process.env.DISCORD_GOLD_CHANNEL_ID,
-    process.env.DISCORD_SILVER_CHANNEL_ID,
-    process.env.DISCORD_BRONZ_CHANNEL_ID,
-    process.env.DISCORD_WHITELIST_INFO_CHANNEL_ID,
-    process.env.DISCORD_VERIFY_HUMANITY_MESSAGE_ID,
-  ];
-  if (envArray.includes(undefined)) {
-    console.error("Some of the env var(s) is(are) missing");
-    process.exit(1);
   }
 };
 

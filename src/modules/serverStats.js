@@ -11,11 +11,8 @@ const updateServerStats = async (bot) => {
     await updateWhitelistCount(bot);
     await updateMemberCount(bot);
     await wait(600001);
-    await updateBotCount(bot);
     await updateOnlineCount(bot);
-    await wait(600001);
     await updateTwitterCount(bot);
-    await wait(600001);
   }
 };
 
@@ -31,24 +28,6 @@ const updateWhitelistCount = async (bot) => {
     }
   } catch (e) {
     sendErrorToLogChannel(bot, "Error on cron job", e);
-  }
-};
-
-const updateBotCount = async (bot) => {
-  const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
-
-  const botCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_BOT_COUNT_CHANNEL_ID
-  );
-  const botCount = guild?.members?.cache?.filter((m) => m.user.bot).size;
-  const botCountChannelName = `🤖 | Bots: ${botCount}`;
-
-  if (
-    botCount &&
-    botCountChannel &&
-    botCountChannel.name !== botCountChannelName
-  ) {
-    botCountChannel.setName(botCountChannelName);
   }
 };
 
