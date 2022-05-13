@@ -1,18 +1,49 @@
+/* eslint-disable multiline-ternary */
 const needle = require("needle");
 
 const { sendErrorToLogChannel, wait } = require("../utils");
 const { remainingWhitelistModel } = require("./whitelist/models");
 
 const updateServerStats = async (bot) => {
+  let waitInMs = 0;
   // eslint-disable-next-line no-constant-condition
   while (true) {
     // https://stackoverflow.com/a/62792412/3756237
-    await wait(600001);
-    await updateWhitelistCount(bot);
-    await updateMemberCount(bot);
-    await wait(600001);
-    await updateOnlineCount(bot);
-    await updateTwitterCount(bot);
+    const shouldWaitWhitelist = await updateWhitelistCount(bot);
+    shouldWaitWhitelist
+      ? (waitInMs = waitInMs + 300000)
+      : (waitInMs = waitInMs + 0);
+    if (waitInMs >= 600000) {
+      await wait(waitInMs);
+      waitInMs = 0;
+    }
+
+    const shouldWaitMemberCount = await updateMemberCount(bot);
+    shouldWaitMemberCount
+      ? (waitInMs = waitInMs + 300000)
+      : (waitInMs = waitInMs + 0);
+    if (waitInMs >= 600000) {
+      await wait(waitInMs);
+      waitInMs = 0;
+    }
+
+    const shouldWaitOnlineCount = await updateOnlineCount(bot);
+    shouldWaitOnlineCount
+      ? (waitInMs = waitInMs + 300000)
+      : (waitInMs = waitInMs + 0);
+    if (waitInMs >= 600000) {
+      await wait(waitInMs);
+      waitInMs = 0;
+    }
+
+    const shouldWaitTwitterCount = await updateTwitterCount(bot);
+    shouldWaitTwitterCount
+      ? (waitInMs = waitInMs + 300000)
+      : (waitInMs = waitInMs + 0);
+    if (waitInMs >= 600000) {
+      await wait(waitInMs);
+      waitInMs = 0;
+    }
   }
 };
 
@@ -25,9 +56,12 @@ const updateWhitelistCount = async (bot) => {
     const whitelistCountChannelName = `Whitelist: ${remaining.count} / 1300`;
     if (remaining && whitelistCountChannel.name !== whitelistCountChannelName) {
       whitelistCountChannel.setName(whitelistCountChannelName);
+      return true;
     }
+    return false;
   } catch (e) {
     sendErrorToLogChannel(bot, "Error on cron job", e);
+    return false;
   }
 };
 
@@ -47,7 +81,9 @@ const updateMemberCount = async (bot) => {
     memberCountChannel.name !== memberCountChannelName
   ) {
     memberCountChannel.setName(memberCountChannelName);
+    return true;
   }
+  return false;
 };
 
 const updateOnlineCount = async (bot) => {
@@ -67,7 +103,9 @@ const updateOnlineCount = async (bot) => {
     onlineUsersCountChannel.name !== onlineUsersCountChannelName
   ) {
     onlineUsersCountChannel.setName(onlineUsersCountChannelName);
+    return true;
   }
+  return false;
 };
 
 const updateTwitterCount = async (bot) => {
@@ -84,10 +122,12 @@ const updateTwitterCount = async (bot) => {
       twitterFollowerCountChannel.name !== twitterFollowerCountChannelName
     ) {
       twitterFollowerCountChannel.setName(twitterFollowerCountChannelName);
+      return true;
     }
+    return false;
   } catch (e) {
     sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
-    console.error(e);
+    return false;
   }
 };
 
