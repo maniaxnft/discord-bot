@@ -60,60 +60,70 @@ const updateWhitelistCount = async (bot) => {
     }
     return false;
   } catch (e) {
-    sendErrorToLogChannel(bot, "Error on cron job", e);
+    sendErrorToLogChannel(bot, "Error at updateWhitelistCount", e);
     return false;
   }
 };
 
 const updateMemberCount = async (bot) => {
-  const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
+  try {
+    const guild = await bot?.guilds?.fetch(process.env.DISCORD_GUILD_ID);
 
-  const memberCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID
-  );
+    const memberCountChannel = await bot?.channels?.cache?.get(
+      process.env.DISCORD_MEMBER_COUNT_CHANNEL_ID
+    );
 
-  const memberCount = guild?.members?.cache?.filter((m) => !m.user.bot).size;
+    const memberCount = guild?.members?.cache?.filter((m) => !m.user.bot).size;
 
-  const memberCountChannelName = `🌍 | Members: ${memberCount}`;
-  if (
-    memberCount &&
-    memberCountChannel &&
-    memberCountChannel.name !== memberCountChannelName
-  ) {
-    memberCountChannel.setName(memberCountChannelName);
-    return true;
+    const memberCountChannelName = `🌍 | Members: ${memberCount}`;
+    if (
+      memberCount &&
+      memberCountChannel &&
+      memberCountChannel.name !== memberCountChannelName
+    ) {
+      memberCountChannel.setName(memberCountChannelName);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    sendErrorToLogChannel(bot, "Error at updateOnlineCount", e);
+    return false;
   }
-  return false;
 };
 
 const updateOnlineCount = async (bot) => {
-  const onlineUsers = bot.guilds?.cache
-    ?.get(process.env.DISCORD_GUILD_ID)
-    .members?.cache?.filter(
-      (m) => m.presence?.status === "online" && !m.user.bot
-    ).size;
+  try {
+    const onlineUsers = bot.guilds?.cache
+      ?.get(process.env.DISCORD_GUILD_ID)
+      .members?.cache?.filter(
+        (m) => m.presence?.status === "online" && !m.user.bot
+      ).size;
 
-  const onlineUsersCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
-  );
-  const onlineUsersCountChannelName = `🟢 | Online: ${onlineUsers}`;
-  if (
-    onlineUsers &&
-    onlineUsersCountChannel &&
-    onlineUsersCountChannel.name !== onlineUsersCountChannelName
-  ) {
-    onlineUsersCountChannel.setName(onlineUsersCountChannelName);
-    return true;
+    const onlineUsersCountChannel = await bot?.channels?.cache?.get(
+      process.env.DISCORD_ONLINE_USERS_COUNT_CHANNEL_ID
+    );
+    const onlineUsersCountChannelName = `🟢 | Online: ${onlineUsers}`;
+    if (
+      onlineUsers &&
+      onlineUsersCountChannel &&
+      onlineUsersCountChannel.name !== onlineUsersCountChannelName
+    ) {
+      onlineUsersCountChannel.setName(onlineUsersCountChannelName);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    sendErrorToLogChannel(bot, "Error at updateOnlineCount", e);
+    return false;
   }
-  return false;
 };
 
 const updateTwitterCount = async (bot) => {
-  let followerCount = undefined;
-  const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
-    process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
-  );
   try {
+    let followerCount = undefined;
+    const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
+      process.env.DISCORD_TWITTER_FOLLOWER_COUNT_CHANNNEL_ID
+    );
     followerCount = await getTwitterFollowerCount(bot);
     const twitterFollowerCountChannelName = `🐦︱ Twitter: ${followerCount}`;
     if (
@@ -126,7 +136,7 @@ const updateTwitterCount = async (bot) => {
     }
     return false;
   } catch (e) {
-    sendErrorToLogChannel(bot, "Error while getting twitter follower count", e);
+    sendErrorToLogChannel(bot, "Error at updateTwitterCount", e);
     return false;
   }
 };
