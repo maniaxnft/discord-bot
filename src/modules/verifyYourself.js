@@ -54,7 +54,7 @@ const verifyYourself = async (bot) => {
         } catch (e) {
           sendErrorToLogChannel(
             bot,
-            "Error while giving verified role to user",
+            "Error at verifyYourself-messageReactionAdd",
             e
           );
         }
