@@ -38,9 +38,19 @@ const verifyYourself = async (bot) => {
         reaction.emoji?.name === verifyEmoji
       ) {
         try {
-          await reaction.message.guild.members.cache
-            .get(user.id)
-            .roles.add(verifiedRole);
+          const member = await reaction.message.guild.members.cache.get(
+            user.id
+          );
+          const hasTeamRole = await member.roles.cache.has(
+            process.env.DISCORD_TEAM_ROLE_ID
+          );
+          if (!hasTeamRole) {
+            await reaction.message.guild.members.cache
+              .get(user.id)
+              .roles.add(verifiedRole);
+          } else {
+            reaction?.users?.remove(user.id);
+          }
         } catch (e) {
           sendErrorToLogChannel(
             bot,
