@@ -6,7 +6,7 @@ const initBot = require("./modules/initBot");
 const initCommands = require("./modules/initCommands");
 const listenTweets = require("./modules/listenTweets");
 const updateServerStats = require("./modules/serverStats");
-const trackTrades = require("./modules/track-trades");
+// const trackTrades = require("./modules/track-trades");
 const verifyYourself = require("./modules/verifyYourself");
 const updateRemainingWhitelist = require("./modules/whitelist");
 
@@ -22,7 +22,7 @@ const boot = async () => {
     await listenTweets(bot);
     verifyYourself(bot);
     updateServerStats(bot);
-    trackTrades(bot);
+    // trackTrades(bot);
     updateRemainingWhitelist(bot);
   } catch (e) {
     sendErrorToLogChannel(bot, "Error on boot", e);
