@@ -54,7 +54,7 @@ const verifyYourself = async (bot) => {
         } catch (e) {
           sendErrorToLogChannel(
             bot,
-            "Error at verifyYourself-messageReactionAdd",
+            "Error at verifyYourself-messageReactionAdd-",
             e
           );
         }
