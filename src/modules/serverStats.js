@@ -17,7 +17,7 @@ const updateServerStats = async (bot) => {
     await updateOnlineCount(bot);
     await wait(300001);
 
-    await updateTwitterCount(bot);
+    await updateTwitterFollowerCount(bot);
     await wait(300001);
   }
 };
@@ -84,7 +84,7 @@ const updateOnlineCount = async (bot) => {
   }
 };
 
-const updateTwitterCount = async (bot) => {
+const updateTwitterFollowerCount = async (bot) => {
   try {
     let followerCount = undefined;
     const twitterFollowerCountChannel = await bot?.channels?.cache?.get(
@@ -100,7 +100,7 @@ const updateTwitterCount = async (bot) => {
       twitterFollowerCountChannel.setName(twitterFollowerCountChannelName);
     }
   } catch (e) {
-    sendErrorToLogChannel(bot, "Error at updateTwitterCount", e);
+    sendErrorToLogChannel(bot, "Error at updateTwitterFollowerCount", e);
   }
 };
 
