@@ -13,7 +13,7 @@ const initBot = async () => {
   });
   try {
     await bot.login(process.env.DISCORD_TOKEN);
-    await wait(5000);
+    await wait(3000);
     console.log("Bot successfully logged in!");
     return bot;
   } catch (e) {

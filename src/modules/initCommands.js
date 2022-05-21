@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const axios = require("axios");
-const { getTop10Invites } = require("./trackInvites");
+const { getTop10Invites } = require("./invite");
 const { wait, sendErrorToLogChannel } = require("../utils");
 
 const initCommands = async (bot) => {
