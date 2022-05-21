@@ -16,7 +16,7 @@ const listenTweets = async (bot) => {
       process.env.DISCORD_TWEETS_CHANNEL_ID
     );
 
-    const fiveMins = 150 * 60000;
+    const fiveMins = 5 * 60000;
 
     const start_time = new Date(new Date().getTime() - fiveMins).toISOString();
     const end_time = new Date().toISOString();
