@@ -3,7 +3,7 @@ require("dotenv-safe").config();
 const initProject = require("./modules/initProject");
 const initBot = require("./modules/initBot");
 const initCommands = require("./modules/initCommands");
-const listenTweets = require("./modules/listenTweets");
+const twitter = require("./modules/twitter");
 const updateServerStats = require("./modules/serverStats");
 const verifyYourself = require("./modules/verifyYourself");
 const updateRemainingWhitelist = require("./modules/whitelist");
@@ -19,14 +19,14 @@ const boot = async () => {
   try {
     await initProject();
     bot = await initBot();
-    // custom(bot);
     await trackInvites(bot);
     await initCommands(bot);
-    await listenTweets(bot);
+    await twitter(bot);
     verifyYourself(bot);
     updateServerStats(bot);
-    // trackTrades(bot);
     updateRemainingWhitelist(bot);
+    // trackTrades(bot);
+    // custom(bot);
   } catch (e) {
     sendErrorToLogChannel(bot, "Error on boot", e);
     throw new Error(e);
