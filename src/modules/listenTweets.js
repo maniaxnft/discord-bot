@@ -44,7 +44,6 @@ const streamConnect = (bot, retryAttempt) => {
           data.detail ===
           "This stream is currently at the maximum allowed connection limit."
         ) {
-          streamConnect(bot, 0);
           sendErrorToLogChannel(bot, data.detail, e);
         }
       }
