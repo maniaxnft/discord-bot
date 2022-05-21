@@ -44,6 +44,7 @@ const streamConnect = (bot, retryAttempt) => {
           data.detail ===
           "This stream is currently at the maximum allowed connection limit."
         ) {
+          streamConnect(bot, 0);
           sendErrorToLogChannel(bot, data.detail, e);
         }
       }
@@ -66,6 +67,9 @@ const sendTweetToChannel = async (bot, tweet) => {
   const channel = await bot?.channels?.cache?.get(
     process.env.DISCORD_TWEETS_CHANNEL_ID
   );
+  if (!channel) {
+    sendErrorToLogChannel(bot, "Tweets channel is undefined ");
+  }
   const tweetText = tweet?.data?.text;
   const tweetDataId = tweet?.data?.id;
   if (channel && tweetText && tweetDataId) {
