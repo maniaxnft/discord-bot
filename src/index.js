@@ -1,6 +1,6 @@
 require("dotenv-safe").config();
 
-const custom = require("./modules/custom");
+// const custom = require("./modules/custom");
 const initProject = require("./modules/initProject");
 const initBot = require("./modules/initBot");
 const initCommands = require("./modules/initCommands");
@@ -20,12 +20,12 @@ const boot = async () => {
     bot = await initBot();
     // custom(bot);
     await trackInvites(bot);
-    // await initCommands(bot);
-    // await listenTweets(bot);
-    // verifyYourself(bot);
-    // updateServerStats(bot);
+    await initCommands(bot);
+    await listenTweets(bot);
+    verifyYourself(bot);
+    updateServerStats(bot);
     // trackTrades(bot);
-    // updateRemainingWhitelist(bot);
+    updateRemainingWhitelist(bot);
   } catch (e) {
     sendErrorToLogChannel(bot, "Error on boot", e);
     throw new Error(e);
